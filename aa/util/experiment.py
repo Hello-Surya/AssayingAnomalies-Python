@@ -1,7 +1,6 @@
 """
 Experiment tracking utilities
 ============================
-
 This module defines the ``ExperimentTracker`` class used to record
 metadata and configuration associated with a particular research run
 of the Assaying Anomalies platform.  In empirical finance, it is
