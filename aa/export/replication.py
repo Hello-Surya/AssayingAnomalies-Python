@@ -36,7 +36,6 @@ This will create a folder ``replication/size_v1`` containing:
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 from typing import Any
 
