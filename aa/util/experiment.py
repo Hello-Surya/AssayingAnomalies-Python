@@ -79,7 +79,9 @@ class ExperimentTracker:
     the lifetime of the instance.
     """
 
-    def __init__(self, *, base_dir: str | Path, config: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(
+        self, *, base_dir: str | Path, config: Optional[Dict[str, Any]] = None
+    ) -> None:
         self.base_dir = Path(base_dir).expanduser().resolve()
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self.config: Dict[str, Any] = config or {}
@@ -103,7 +105,9 @@ class ExperimentTracker:
             serialized = json.dumps(config, sort_keys=True, default=str)
         except TypeError:
             # Fallback: convert non‑serialisable objects to their repr
-            serialized = json.dumps({k: repr(v) for k, v in config.items()}, sort_keys=True)
+            serialized = json.dumps(
+                {k: repr(v) for k, v in config.items()}, sort_keys=True
+            )
         h = hashlib.blake2b(digest_size=16)
         h.update(serialized.encode("utf-8"))
         return h.hexdigest()
@@ -112,7 +116,9 @@ class ExperimentTracker:
         # Gather versions of key packages for reproducibility
         packages = ["python", "numpy", "pandas", "joblib", "pyarrow"]
         versions: Dict[str, Optional[str]] = {}
-        versions["python"] = f"{os.sys.version_info.major}.{os.sys.version_info.minor}.{os.sys.version_info.micro}"
+        versions["python"] = (
+            f"{os.sys.version_info.major}.{os.sys.version_info.minor}.{os.sys.version_info.micro}"
+        )
         for pkg in packages[1:]:
             try:
                 versions[pkg] = importlib.metadata.version(pkg)  # type: ignore[assignment]

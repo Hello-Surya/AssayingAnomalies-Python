@@ -130,30 +130,56 @@ def export_replication_package(
     readme_path = out_path / "README.md"
     with open(readme_path, "w", encoding="utf-8") as f:
         f.write(f"# Replication package for experiment {experiment.id}\n\n")
-        f.write("This folder contains all artefacts needed to reproduce the results of a single experiment executed\n")
-        f.write("with the Assaying Anomalies research platform.  It was generated automatically by the\n")
+        f.write(
+            "This folder contains all artefacts needed to reproduce the results of a single experiment executed\n"
+        )
+        f.write(
+            "with the Assaying Anomalies research platform.  It was generated automatically by the\n"
+        )
         f.write("`export_replication_package` utility.\n\n")
         f.write("## Contents\n\n")
-        f.write("* `experiment.json`: Machine‑readable metadata about the experiment (configuration, software versions,\n")
+        f.write(
+            "* `experiment.json`: Machine‑readable metadata about the experiment (configuration, software versions,\n"
+        )
         f.write("  pipeline fingerprint, task logs).\n")
-        f.write("* `data/metadata.json`: Metadata for each dataset saved by the pipeline (rows, columns, hashes, etc.).\n")
-        f.write("* `data/*.csv` and `data/*.parquet`: The datasets produced by the pipeline.  These files can be loaded\n")
-        f.write("  into Python, R or other statistical software to regenerate tables and figures.\n")
+        f.write(
+            "* `data/metadata.json`: Metadata for each dataset saved by the pipeline (rows, columns, hashes, etc.).\n"
+        )
+        f.write(
+            "* `data/*.csv` and `data/*.parquet`: The datasets produced by the pipeline.  These files can be loaded\n"
+        )
+        f.write(
+            "  into Python, R or other statistical software to regenerate tables and figures.\n"
+        )
         f.write("\n")
         f.write("## How to reproduce\n\n")
-        f.write("1. Install the same versions of the software packages recorded in `experiment.json` (see the\n")
-        f.write("   `environment` section).  Using conda or virtualenv is recommended.\n")
-        f.write("2. Download the replication package and extract it to a convenient location.\n")
-        f.write("3. Load the datasets from the `data` directory into your analysis script.  For example, in Python:\n")
+        f.write(
+            "1. Install the same versions of the software packages recorded in `experiment.json` (see the\n"
+        )
+        f.write(
+            "   `environment` section).  Using conda or virtualenv is recommended.\n"
+        )
+        f.write(
+            "2. Download the replication package and extract it to a convenient location.\n"
+        )
+        f.write(
+            "3. Load the datasets from the `data` directory into your analysis script.  For example, in Python:\n"
+        )
         f.write("\n")
         f.write("```python\n")
         f.write("import pandas as pd\n")
         f.write("df = pd.read_csv('data/your_dataset.csv')\n")
         f.write("```\n")
         f.write("\n")
-        f.write("4. Recreate the tables or figures by following the analysis code referenced in the original\n")
-        f.write("   experiment.  Because all parameters and seeds are recorded, your results should match bit‑for‑bit.\n")
+        f.write(
+            "4. Recreate the tables or figures by following the analysis code referenced in the original\n"
+        )
+        f.write(
+            "   experiment.  Because all parameters and seeds are recorded, your results should match bit‑for‑bit.\n"
+        )
         f.write("\n")
         f.write("## Contact\n\n")
-        f.write("If you encounter issues reproducing the results, please consult the original repository or\n")
+        f.write(
+            "If you encounter issues reproducing the results, please consult the original repository or\n"
+        )
         f.write("contact the maintainers.\n")
