@@ -27,7 +27,6 @@ import pandas as pd
 
 from aa.util.experiment import ExperimentTracker
 
-
 __all__ = ["export_replication_package"]
 
 
@@ -131,8 +130,7 @@ def export_replication_package(
         )
         file.write("## Contents\n\n")
         file.write(
-            "* `experiment.json`: Machine-readable metadata about the "
-            "experiment.\n"
+            "* `experiment.json`: Machine-readable metadata about the " "experiment.\n"
         )
         file.write(
             "* `data/metadata.json`: Metadata for each dataset saved by the "
@@ -144,14 +142,11 @@ def export_replication_package(
         )
         file.write("\n## How to reproduce\n\n")
         file.write(
-            "1. Install the same software versions recorded in "
-            "`experiment.json`.\n"
+            "1. Install the same software versions recorded in " "`experiment.json`.\n"
         )
         file.write("2. Download and extract this replication package.\n")
         file.write("3. Load the exported data files in your analysis code.\n")
-        file.write(
-            "4. Recreate tables and figures using the recorded configuration.\n"
-        )
+        file.write("4. Recreate tables and figures using the recorded configuration.\n")
         file.write("\n## Contact\n\n")
         file.write(
             "If you encounter issues reproducing the results, consult the "
