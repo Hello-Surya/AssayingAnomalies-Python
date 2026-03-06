@@ -1,7 +1,6 @@
 """
 Replication package exporter
 ===========================
-
 This module provides a utility function to generate a replication
 package from a completed experiment.  A replication package bundles
 together the experiment metadata and the datasets produced by the
