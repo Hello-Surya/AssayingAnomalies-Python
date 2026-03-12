@@ -63,7 +63,6 @@ def test_run_double_sort_high_low():
     returns, s1, s2, size, exch = _make_synthetic_data()
     config = DoubleSortConfig(n_bins_1=2, n_bins_2=2, nyse_breaks=False, min_obs=1, conditional=False)
     res = run_double_sort(returns=returns, signal_1=s1, signal_2=s2, size=size, exch=exch, config=config)
-    ts = res["time_series"]
     summary = res["summary"]
     hl1 = res["hl_dim1"]
     hl2 = res["hl_dim2"]

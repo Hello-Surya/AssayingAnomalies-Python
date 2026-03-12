@@ -30,9 +30,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, Any, Iterable, List
-
+from typing import Any, Dict, List
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
