@@ -1,25 +1,25 @@
 """
-    Basic statistical helper functions.
+Basic statistical helper functions.
 
-    This module contains small utility routines used throughout the
-    Assaying Anomalies Python port.  These helpers are analogous to
-    various small MATLAB functions (e.g. ``winsorize.m``, ``lag.m``)
-    and are written to operate on ``pandas`` objects.  They do not
-    introduce any new algorithms beyond standard practices.
+This module contains small utility routines used throughout the
+Assaying Anomalies Python port.  These helpers are analogous to
+various small MATLAB functions (e.g. ``winsorize.m``, ``lag.m``)
+and are written to operate on ``pandas`` objects.  They do not
+introduce any new algorithms beyond standard practices.
 
-    Functions
-    ---------
-    winsorize
-        Cap extreme values of a Series or each column of a DataFrame at
-        specified quantiles.
+Functions
+---------
+winsorize
+    Cap extreme values of a Series or each column of a DataFrame at
+    specified quantiles.
 
-    rank_series
-        Compute fractional ranks of a Series, scaled to the unit
-        interval.
+rank_series
+    Compute fractional ranks of a Series, scaled to the unit
+    interval.
 
-    lag
-        Shift a Series or DataFrame by a specified number of periods.
-    """
+lag
+    Shift a Series or DataFrame by a specified number of periods.
+"""
 
 from __future__ import annotations
 

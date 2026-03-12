@@ -1,31 +1,31 @@
 """
-    Factor comparison utilities for anomaly returns.
+Factor comparison utilities for anomaly returns.
 
-    This module provides simple time‑series regressions of portfolio
-    returns on benchmark factor models.  It is a direct translation of
-    the functionality found in MATLAB utilities such as
-    ``runBivSort.m`` (for alphas and loadings) and ``calcGenAlpha.m``.
-    The functions here are intentionally minimal: they accept return
-    series and factor returns, fit ordinary least squares regressions
-    with an intercept, and report parameter estimates and t‑statistics.
-    Users seeking cross‑sectional regressions or Newey–West correction
-    should refer to :mod:`aa.asset_pricing.fama_macbeth`.
+This module provides simple time‑series regressions of portfolio
+returns on benchmark factor models.  It is a direct translation of
+the functionality found in MATLAB utilities such as
+``runBivSort.m`` (for alphas and loadings) and ``calcGenAlpha.m``.
+The functions here are intentionally minimal: they accept return
+series and factor returns, fit ordinary least squares regressions
+with an intercept, and report parameter estimates and t‑statistics.
+Users seeking cross‑sectional regressions or Newey–West correction
+should refer to :mod:`aa.asset_pricing.fama_macbeth`.
 
-    Functions
-    ---------
-    regress_against_factors
-        Regress a single portfolio return series on a set of factor
-        returns.
+Functions
+---------
+regress_against_factors
+    Regress a single portfolio return series on a set of factor
+    returns.
 
-    regress_portfolios
-        Regress multiple portfolio return series on factors and
-        assemble the results into a tidy DataFrame.
+regress_portfolios
+    Regress multiple portfolio return series on factors and
+    assemble the results into a tidy DataFrame.
 
-    Notes
-    -----
-    All inputs must be indexed by the same date frequency.  Missing
-    observations are dropped before estimation.  Factors should be
-    provided without an intercept; one will be added internally.
+Notes
+-----
+All inputs must be indexed by the same date frequency.  Missing
+observations are dropped before estimation.  Factors should be
+provided without an intercept; one will be added internally.
 """
 
 from __future__ import annotations
@@ -84,7 +84,14 @@ def regress_against_factors(
     # Join on the index and drop missing
     df = pd.concat([y, X], axis=1, join="inner").dropna()
     if df.empty:
-        return {"alpha": np.nan, "t_alpha": np.nan, "betas": pd.Series(dtype=float), "t_betas": pd.Series(dtype=float), "r2": np.nan, "nobs": 0}
+        return {
+            "alpha": np.nan,
+            "t_alpha": np.nan,
+            "betas": pd.Series(dtype=float),
+            "t_betas": pd.Series(dtype=float),
+            "r2": np.nan,
+            "nobs": 0,
+        }
     y_aligned = df.iloc[:, 0]
     X_aligned = df.iloc[:, 1:]
     if add_intercept:

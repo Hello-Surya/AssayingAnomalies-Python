@@ -1,34 +1,34 @@
 """
-    Anomaly reporting and summary tables.
+Anomaly reporting and summary tables.
 
-    This module provides helper functions to assemble the outputs of
-    portfolio sorts and performance evaluations into human‑readable
-    tables.  The aim is to replicate the functionality of MATLAB
-    scripts that generate comparison tables of anomaly strategies.  By
-    accepting Python dictionaries of metrics and converting them into
-    ``pandas`` DataFrames, these helpers integrate seamlessly with
-    existing reporting tools (e.g. conversion to Markdown or LaTeX via
-    :mod:`pandas`).
+This module provides helper functions to assemble the outputs of
+portfolio sorts and performance evaluations into human‑readable
+tables.  The aim is to replicate the functionality of MATLAB
+scripts that generate comparison tables of anomaly strategies.  By
+accepting Python dictionaries of metrics and converting them into
+``pandas`` DataFrames, these helpers integrate seamlessly with
+existing reporting tools (e.g. conversion to Markdown or LaTeX via
+:mod:`pandas`).
 
-    Functions
-    ---------
-    make_summary_table
-        Assemble a tidy DataFrame from a dictionary of metric
-        dictionaries, one entry per anomaly.
+Functions
+---------
+make_summary_table
+    Assemble a tidy DataFrame from a dictionary of metric
+    dictionaries, one entry per anomaly.
 
-    to_markdown
-        Convert a DataFrame into Markdown format using
-        ``pandas.DataFrame.to_markdown``.
+to_markdown
+    Convert a DataFrame into Markdown format using
+    ``pandas.DataFrame.to_markdown``.
 
-    to_latex
-        Convert a DataFrame into LaTeX format using
-        ``pandas.DataFrame.to_latex``.
+to_latex
+    Convert a DataFrame into LaTeX format using
+    ``pandas.DataFrame.to_latex``.
 
-    Notes
-    -----
-    These functions are intentionally lightweight.  They do not apply
-    styling or formatting beyond what pandas provides.  Users may
-    choose to post‑process the resulting strings for publication.
+Notes
+-----
+These functions are intentionally lightweight.  They do not apply
+styling or formatting beyond what pandas provides.  Users may
+choose to post‑process the resulting strings for publication.
 """
 
 from __future__ import annotations

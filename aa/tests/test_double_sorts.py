@@ -50,8 +50,12 @@ def _make_synthetic_data():
 
 def test_make_double_sort_ind_basic():
     returns, s1, s2, size, exch = _make_synthetic_data()
-    config = DoubleSortConfig(n_bins_1=2, n_bins_2=3, nyse_breaks=False, min_obs=1, conditional=False)
-    ind = make_double_sort_ind(returns=returns, signal_1=s1, signal_2=s2, size=size, exch=exch, config=config)
+    config = DoubleSortConfig(
+        n_bins_1=2, n_bins_2=3, nyse_breaks=False, min_obs=1, conditional=False
+    )
+    ind = make_double_sort_ind(
+        returns=returns, signal_1=s1, signal_2=s2, size=size, exch=exch, config=config
+    )
     # All rows should have bin assignments
     assert not ind.empty
     assert {"date", "permno", "bin1", "bin2"}.issubset(ind.columns)
@@ -61,8 +65,12 @@ def test_make_double_sort_ind_basic():
 
 def test_run_double_sort_high_low():
     returns, s1, s2, size, exch = _make_synthetic_data()
-    config = DoubleSortConfig(n_bins_1=2, n_bins_2=2, nyse_breaks=False, min_obs=1, conditional=False)
-    res = run_double_sort(returns=returns, signal_1=s1, signal_2=s2, size=size, exch=exch, config=config)
+    config = DoubleSortConfig(
+        n_bins_1=2, n_bins_2=2, nyse_breaks=False, min_obs=1, conditional=False
+    )
+    res = run_double_sort(
+        returns=returns, signal_1=s1, signal_2=s2, size=size, exch=exch, config=config
+    )
     summary = res["summary"]
     hl1 = res["hl_dim1"]
     hl2 = res["hl_dim2"]

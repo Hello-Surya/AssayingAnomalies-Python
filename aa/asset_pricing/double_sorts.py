@@ -1,45 +1,45 @@
 """
-    Double portfolio sorts for anomaly construction.
+Double portfolio sorts for anomaly construction.
 
-    This module provides a thin layer on top of the existing
-    :mod:`aa.asset_pricing.double_sort` implementation, exposing a more
-    MATLAB‑like API.  It translates the logic of the MATLAB functions
-    ``makeBivSortInd.m`` and ``runBivSort.m`` found in the original
-    Assaying Anomalies repository into Python.  The goal is to preserve
-    the behaviour of the bivariate sorts while integrating cleanly with
-    the existing Python architecture.
+This module provides a thin layer on top of the existing
+:mod:`aa.asset_pricing.double_sort` implementation, exposing a more
+MATLAB‑like API.  It translates the logic of the MATLAB functions
+``makeBivSortInd.m`` and ``runBivSort.m`` found in the original
+Assaying Anomalies repository into Python.  The goal is to preserve
+the behaviour of the bivariate sorts while integrating cleanly with
+the existing Python architecture.
 
-    Functions
-    ---------
-    make_double_sort_ind
-        Assign integer portfolio identifiers for a double sort on two
-        characteristics.  Equivalent to MATLAB's ``makeBivSortInd``.
+Functions
+---------
+make_double_sort_ind
+    Assign integer portfolio identifiers for a double sort on two
+    characteristics.  Equivalent to MATLAB's ``makeBivSortInd``.
 
-    run_double_sort
-        Compute equal‑weighted and value‑weighted returns for each
-        (bin1, bin2) portfolio and produce high‑minus‑low series along
-        each dimension.  Equivalent to MATLAB's ``runBivSort`` when
-        called with a holding period of one month and default weighting.
+run_double_sort
+    Compute equal‑weighted and value‑weighted returns for each
+    (bin1, bin2) portfolio and produce high‑minus‑low series along
+    each dimension.  Equivalent to MATLAB's ``runBivSort`` when
+    called with a holding period of one month and default weighting.
 
-    compute_long_short_series
-        Convenience helper that extracts the long–short (high minus low)
-        series from the output of :func:`run_double_sort`.
+compute_long_short_series
+    Convenience helper that extracts the long–short (high minus low)
+    series from the output of :func:`run_double_sort`.
 
-    Notes
-    -----
-    The functions in this module are written to operate on
-    ``pandas`` DataFrames in a long format.  Each input DataFrame
-    should contain a ``date`` column of dtype ``datetime64`` and a
-    ``permno`` column identifying individual securities.  Signals and
-    returns must be provided separately; the functions will merge them
-    internally.
+Notes
+-----
+The functions in this module are written to operate on
+``pandas`` DataFrames in a long format.  Each input DataFrame
+should contain a ``date`` column of dtype ``datetime64`` and a
+``permno`` column identifying individual securities.  Signals and
+returns must be provided separately; the functions will merge them
+internally.
 
-    Unlike MATLAB, which often works with dense matrices and relies on
-    implicit workspace state, this implementation explicitly accepts
-    every input as an argument and returns results as dictionaries of
-    DataFrames.  The bin assignments are numbered starting from 1, and
-    missing assignments are represented as ``NaN`` (nullable integer
-    ``Int64`` in pandas).
+Unlike MATLAB, which often works with dense matrices and relies on
+implicit workspace state, this implementation explicitly accepts
+every input as an argument and returns results as dictionaries of
+DataFrames.  The bin assignments are numbered starting from 1, and
+missing assignments are represented as ``NaN`` (nullable integer
+``Int64`` in pandas).
 """
 
 from __future__ import annotations
@@ -188,9 +188,7 @@ def make_double_sort_ind(
     # We only need date and permno for index assignment; returns and size
     # are ignored here but merging with returns ensures we only consider
     # observations with available returns.
-    base = base.merge(
-        returns[["date", "permno"]], on=["date", "permno"], how="inner"
-    )
+    base = base.merge(returns[["date", "permno"]], on=["date", "permno"], how="inner")
     if exch is not None:
         base = base.merge(
             exch[["date", "permno", "exchcd"]], on=["date", "permno"], how="left"
@@ -233,9 +231,7 @@ def make_double_sort_ind(
                 if sub_edges.size < 2:
                     continue
                 mask = g["bin1"] == b1
-                g.loc[mask, "bin2"] = _assign_bins(
-                    g.loc[mask, "signal2"], sub_edges
-                )
+                g.loc[mask, "bin2"] = _assign_bins(g.loc[mask, "signal2"], sub_edges)
         else:
             # Independent sort: breakpoints computed on full universe
             edges2 = _bin_edges(bp_univ["signal2"], config.n_bins_2)
@@ -328,22 +324,20 @@ def run_double_sort(
     )
     if ind.empty:
         # Return empty structures if no assignments
-        empty_ts = pd.DataFrame(
-            columns=["date", "bin1", "bin2", "ret_ew", "ret_vw"]
-        )
+        empty_ts = pd.DataFrame(columns=["date", "bin1", "bin2", "ret_ew", "ret_vw"])
         empty_hl = pd.DataFrame(columns=["date", "hl_ew", "hl_vw"])
         return {
             "time_series": empty_ts,
-            "summary": pd.DataFrame(
-                columns=["bin1", "bin2", "ret_ew", "ret_vw"]
-            ),
+            "summary": pd.DataFrame(columns=["bin1", "bin2", "ret_ew", "ret_vw"]),
             "hl_dim1": empty_hl,
             "hl_dim2": empty_hl,
         }
     # Merge assignments with returns and size to compute portfolio returns
     base = ind.merge(returns, on=["date", "permno"], how="left")
     if size is not None and "me" in size.columns:
-        base = base.merge(size[["date", "permno", "me"]], on=["date", "permno"], how="left")
+        base = base.merge(
+            size[["date", "permno", "me"]], on=["date", "permno"], how="left"
+        )
     # Prepare lists to accumulate per‑period results
     ts_frames: list[pd.DataFrame] = []
     hl1_frames: list[pd.DataFrame] = []
@@ -382,8 +376,12 @@ def run_double_sort(
                 r_high = sub.loc[sub["bin1"] == b1_max]
                 r_low = sub.loc[sub["bin1"] == b1_min]
                 if len(r_high) and len(r_low):
-                    diff_ew = float(r_high["ret_ew"].iloc[0]) - float(r_low["ret_ew"].iloc[0])
-                    diff_vw = float(r_high["ret_vw"].iloc[0]) - float(r_low["ret_vw"].iloc[0])
+                    diff_ew = float(r_high["ret_ew"].iloc[0]) - float(
+                        r_low["ret_ew"].iloc[0]
+                    )
+                    diff_vw = float(r_high["ret_vw"].iloc[0]) - float(
+                        r_low["ret_vw"].iloc[0]
+                    )
                     hl1_list.append((b2, diff_ew, diff_vw))
             if hl1_list:
                 hl1_frames.append(
@@ -405,8 +403,12 @@ def run_double_sort(
                 r_high = sub.loc[sub["bin2"] == b2_max]
                 r_low = sub.loc[sub["bin2"] == b2_min]
                 if len(r_high) and len(r_low):
-                    diff_ew = float(r_high["ret_ew"].iloc[0]) - float(r_low["ret_ew"].iloc[0])
-                    diff_vw = float(r_high["ret_vw"].iloc[0]) - float(r_low["ret_vw"].iloc[0])
+                    diff_ew = float(r_high["ret_ew"].iloc[0]) - float(
+                        r_low["ret_ew"].iloc[0]
+                    )
+                    diff_vw = float(r_high["ret_vw"].iloc[0]) - float(
+                        r_low["ret_vw"].iloc[0]
+                    )
                     hl2_list.append((b1, diff_ew, diff_vw))
             if hl2_list:
                 hl2_frames.append(
@@ -448,7 +450,9 @@ def run_double_sort(
     }
 
 
-def compute_long_short_series(result: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
+def compute_long_short_series(
+    result: Dict[str, pd.DataFrame],
+) -> Dict[str, pd.DataFrame]:
     """Extract long–short series along both dimensions from a run result.
 
     Given the output of :func:`run_double_sort`, this helper simply

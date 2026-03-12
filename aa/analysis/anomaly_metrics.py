@@ -1,46 +1,46 @@
 """
-    Anomaly performance metrics and ranking utilities.
+Anomaly performance metrics and ranking utilities.
 
-    This module implements common statistics used to evaluate the
-    profitability and risk profile of anomaly strategies.  These
-    functions are inspired by various MATLAB utilities in the
-    Assaying Anomalies codebase (e.g. ``calcPerfStats.m`` and
-    ``calcDrawdowns.m``) but are rewritten in Python to operate on
-    ``pandas`` Series.  They do not introduce new models or research
-    ideas; rather, they provide a clear and testable interface for
-    computing basic metrics such as mean return, t‑statistics, Sharpe
-    ratios, drawdowns and portfolio turnover.
+This module implements common statistics used to evaluate the
+profitability and risk profile of anomaly strategies.  These
+functions are inspired by various MATLAB utilities in the
+Assaying Anomalies codebase (e.g. ``calcPerfStats.m`` and
+``calcDrawdowns.m``) but are rewritten in Python to operate on
+``pandas`` Series.  They do not introduce new models or research
+ideas; rather, they provide a clear and testable interface for
+computing basic metrics such as mean return, t‑statistics, Sharpe
+ratios, drawdowns and portfolio turnover.
 
-    Functions
-    ---------
-    mean_return
-        Compute the average return of a series, optionally annualising.
+Functions
+---------
+mean_return
+    Compute the average return of a series, optionally annualising.
 
-    t_statistic
-        Compute the t‑statistic of the mean return under the IID
-        assumption.
+t_statistic
+    Compute the t‑statistic of the mean return under the IID
+    assumption.
 
-    sharpe_ratio
-        Compute the (annualised) Sharpe ratio given a series of
-        returns.
+sharpe_ratio
+    Compute the (annualised) Sharpe ratio given a series of
+    returns.
 
-    max_drawdown
-        Compute the maximum drawdown of a return series.
+max_drawdown
+    Compute the maximum drawdown of a return series.
 
-    compute_turnover
-        Estimate the turnover of a strategy given portfolio
-        assignments over time.
+compute_turnover
+    Estimate the turnover of a strategy given portfolio
+    assignments over time.
 
-    evaluate_anomaly
-        Convenience wrapper that returns a dictionary of common
-        metrics for a given return series.
+evaluate_anomaly
+    Convenience wrapper that returns a dictionary of common
+    metrics for a given return series.
 
-    Notes
-    -----
-    All functions accept a ``pandas`` Series of periodic returns.  The
-    periodicity is inferred via the ``periods_per_year`` parameter
-    (default ``12`` for monthly data).  Missing values are dropped
-    prior to computation.
+Notes
+-----
+All functions accept a ``pandas`` Series of periodic returns.  The
+periodicity is inferred via the ``periods_per_year`` parameter
+(default ``12`` for monthly data).  Missing values are dropped
+prior to computation.
 """
 
 from __future__ import annotations
@@ -49,7 +49,9 @@ import numpy as np
 import pandas as pd
 
 
-def mean_return(returns: pd.Series, *, annualize: bool = False, periods_per_year: int = 12) -> float:
+def mean_return(
+    returns: pd.Series, *, annualize: bool = False, periods_per_year: int = 12
+) -> float:
     """Compute the average return of a series.
 
     Parameters
@@ -235,7 +237,9 @@ def compute_turnover(assignments: pd.DataFrame) -> float:
         prev_df = assignments[assignments["date"] == prev_date][["permno"] + cols]
         curr_df = assignments[assignments["date"] == curr_date][["permno"] + cols]
         # Merge to find overlapping securities
-        merged = prev_df.merge(curr_df, on="permno", how="inner", suffixes=("_prev", "_curr"))
+        merged = prev_df.merge(
+            curr_df, on="permno", how="inner", suffixes=("_prev", "_curr")
+        )
         if merged.empty:
             # No overlapping securities; turnover is 100%
             turnover_rates.append(1.0)
