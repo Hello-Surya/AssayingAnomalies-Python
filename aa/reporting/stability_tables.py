@@ -1,60 +1,60 @@
 """
 Stability and robustness reporting utilities.
-
-This module provides placeholder functions for stability and
-robustness tables.  The full implementations were introduced in
-earlier milestones and are beyond the scope of milestone 7.  The
-functions defined here exist solely to preserve API compatibility
-with the original package and raise ``NotImplementedError`` when
-called.
 """
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Callable
+
+import pandas as pd
 
 __all__ = ["stability_table", "robustness_table", "null_distribution_summary"]
 
 
-def stability_table(*args: Any, **kwargs: Any) -> Dict[str, str]:  # pragma: no cover
-    """Placeholder for the stability table function.
+def stability_table(
+    results_by_regime: dict[str, Any],
+    metric_fn: Callable[[Any], float],
+) -> pd.DataFrame:
+    """Create a simple stability table across regimes.
 
-    Raises
-    ------
-    NotImplementedError
-        Always raised.  The full stability reporting utilities were
-        introduced in milestone 4 and are not ported here.
+    Parameters
+    ----------
+    results_by_regime : dict
+        Mapping from regime name to a result object.
+    metric_fn : callable
+        Function that takes one result object and returns a scalar metric.
+
+    Returns
+    -------
+    DataFrame
+        DataFrame with columns ``regime`` and ``metric``.
     """
-    raise NotImplementedError(
-        "stability_table is not implemented in this simplified port."
-    )
+    rows: list[dict[str, Any]] = []
+    for regime, result in results_by_regime.items():
+        rows.append({"regime": regime, "metric": metric_fn(result)})
+    return pd.DataFrame(rows)
 
 
-def robustness_table(*args: Any, **kwargs: Any) -> Dict[str, str]:  # pragma: no cover
-    """Placeholder for the robustness table function.
-
-    Raises
-    ------
-    NotImplementedError
-        Always raised.  The full robustness reporting utilities were
-        introduced in milestone 4 and are not ported here.
-    """
-    raise NotImplementedError(
-        "robustness_table is not implemented in this simplified port."
-    )
+def robustness_table(
+    results_by_spec: dict[str, Any],
+    metric_fn: Callable[[Any], float],
+) -> pd.DataFrame:
+    """Create a simple robustness table across specifications."""
+    rows: list[dict[str, Any]] = []
+    for spec, result in results_by_spec.items():
+        rows.append({"specification": spec, "metric": metric_fn(result)})
+    return pd.DataFrame(rows)
 
 
-def null_distribution_summary(
-    *args: Any, **kwargs: Any
-) -> Dict[str, str]:  # pragma: no cover
-    """Placeholder for null distribution summary function.
-
-    Raises
-    ------
-    NotImplementedError
-        Always raised.  The null distribution summary was introduced
-        in milestone 4 and is not ported here.
-    """
-    raise NotImplementedError(
-        "null_distribution_summary is not implemented in this simplified port."
+def null_distribution_summary(values: pd.Series | list[float]) -> pd.DataFrame:
+    """Summarize a null distribution with standard descriptive stats."""
+    s = pd.Series(values, dtype=float)
+    return pd.DataFrame(
+        {
+            "mean": [float(s.mean())],
+            "std": [float(s.std(ddof=1))],
+            "min": [float(s.min())],
+            "median": [float(s.median())],
+            "max": [float(s.max())],
+        }
     )
