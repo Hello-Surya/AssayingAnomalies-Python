@@ -16,9 +16,8 @@ floating‑point computations.
 
 from __future__ import annotations
 
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, Tuple
 
-import numpy as np
 import pandas as pd
 
 __all__ = ["compare_metrics", "parity_ok"]

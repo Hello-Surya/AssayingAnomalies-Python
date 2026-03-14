@@ -42,7 +42,7 @@ from typing import Dict, List, Optional, Any, Union
 import pandas as pd
 
 from aa.analysis.anomaly_pipeline import evaluate_signals
-from aa.analysis.anomaly_ranking import rank_anomalies, top_decile, average_rank
+from aa.analysis.anomaly_ranking import rank_anomalies, average_rank
 from aa.reporting.library_tables import performance_tables, ranking_tables
 
 __all__ = ["run_anomaly_library", "main"]
