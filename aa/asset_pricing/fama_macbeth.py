@@ -175,7 +175,7 @@ def fama_macbeth(
     return lambdas, lambda_ts, se
 
 
-ddef fama_macbeth_full(
+def fama_macbeth_full(
     panel: pd.DataFrame,
     y: str = "ret",
     xcols: Sequence[str] | None = None,
@@ -190,6 +190,7 @@ ddef fama_macbeth_full(
     the number of periods used for each coefficient.
 
     Parameters
+
     ----------
     panel, y, xcols, time_col, nw_lags
         See :func:`fama_macbeth` for definitions.
