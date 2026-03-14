@@ -214,14 +214,9 @@ def fama_macbeth_full(
     n_counts = lambda_ts.count()
 
     return {
-        # legacy keys expected by tests
         "lambdas": lambdas,
         "lambda_ts": lambda_ts,
         "se": se,
         "tstat": t_vals,
         "n_obs": n_counts,
-        # backward-compatible aliases
-        "lambda": lambdas,
-        "t": t_vals,
-        "n": n_counts,
     }
