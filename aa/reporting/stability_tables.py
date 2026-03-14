@@ -49,10 +49,32 @@ def stability_table(
 
 
 def robustness_table(
-    results_by_spec: dict[str, Any],
-    metric_fn: Callable[[Any], float],
+    results_by_spec: Any,
+    metric_fn: Callable[[Any], float] | None = None,
 ) -> dict[str, str]:
-    """Create a formatted robustness table across specifications."""
+    """Create a formatted robustness table.
+
+    Parameters
+    ----------
+    results_by_spec : DataFrame or dict
+        Either a precomputed robustness DataFrame or a mapping from
+        specification name to result objects.
+    metric_fn : callable, optional
+        Function used to extract a scalar metric from each result object
+        when ``results_by_spec`` is a dict.
+
+    Returns
+    -------
+    dict[str, str]
+        Dictionary with ``markdown`` and ``latex`` keys.
+    """
+    if isinstance(results_by_spec, pd.DataFrame):
+        df = results_by_spec.copy()
+        return _format_table(df)
+
+    if metric_fn is None:
+        raise TypeError("metric_fn is required when results_by_spec is not a DataFrame")
+
     rows: list[dict[str, Any]] = []
     for spec, result in results_by_spec.items():
         rows.append({"specification": spec, "metric": metric_fn(result)})
