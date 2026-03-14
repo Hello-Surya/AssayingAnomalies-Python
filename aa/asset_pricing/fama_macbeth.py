@@ -175,7 +175,7 @@ def fama_macbeth(
     return lambdas, lambda_ts, se
 
 
-def fama_macbeth_full(
+ddef fama_macbeth_full(
     panel: pd.DataFrame,
     y: str = "ret",
     xcols: Sequence[str] | None = None,
@@ -183,10 +183,10 @@ def fama_macbeth_full(
     time_col: str = "yyyymm",
     nw_lags: int | None = None,
 ) -> Dict[str, pd.DataFrame | pd.Series]:
-    """Full Fama–MacBeth regression with t‑statistics and counts.
+    """Full Fama–MacBeth regression with t-statistics and counts.
 
-    This function runs the two‑pass procedure and returns the
-    average risk prices, their Newey–West standard errors, t‑values and
+    This function runs the two-pass procedure and returns the
+    average risk prices, their Newey–West standard errors, t-values and
     the number of periods used for each coefficient.
 
     Parameters
@@ -197,25 +197,30 @@ def fama_macbeth_full(
     Returns
     -------
     dict
-        Dictionary containing:
+        Dictionary containing both the legacy keys expected by the test
+        suite and the newer alias keys used elsewhere in the codebase.
 
-        ``"lambda"`` – Series of average coefficients.
-        ``"lambda_ts"`` – DataFrame of period‑by‑period coefficients.
-        ``"se"`` – Series of Newey–West standard errors.
-        ``"t"`` – Series of t‑values (``lambda / se``).
-        ``"n"`` – Series of observation counts per coefficient (number of periods).
+        Legacy keys:
+        ``"lambdas"``, ``"lambda_ts"``, ``"se"``, ``"tstat"``, ``"n_obs"``
+
+        Alias keys:
+        ``"lambda"``, ``"t"``, ``"n"``
     """
     lambdas, lambda_ts, se = fama_macbeth(
         panel, y=y, xcols=xcols, time_col=time_col, nw_lags=nw_lags
     )
-    # t‑statistics: lambda divided by standard error
     t_vals = lambdas / se
-    # Number of non‑missing period observations per coefficient
     n_counts = lambda_ts.count()
+
     return {
-        "lambda": lambdas,
+        # legacy keys expected by tests
+        "lambdas": lambdas,
         "lambda_ts": lambda_ts,
         "se": se,
+        "tstat": t_vals,
+        "n_obs": n_counts,
+        # backward-compatible aliases
+        "lambda": lambdas,
         "t": t_vals,
         "n": n_counts,
     }
