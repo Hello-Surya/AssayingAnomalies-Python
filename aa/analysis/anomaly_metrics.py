@@ -3,54 +3,59 @@ Anomaly performance metrics and ranking utilities.
 
 This module implements common statistics used to evaluate the
 profitability and risk profile of anomaly strategies.  These
-functions are inspired by various MATLAB utilities in the
-Assaying Anomalies codebase (e.g. ``calcPerfStats.m`` and
-``calcDrawdowns.m``) but are rewritten in Python to operate on
-``pandas`` Series.  They do not introduce new models or research
-ideas; rather, they provide a clear and testable interface for
-computing basic metrics such as mean return, t‑statistics, Sharpe
-ratios, drawdowns and portfolio turnover.
+functions are translations of the MATLAB utilities used in the
+original Assaying Anomalies toolkit (e.g. ``calcPerfStats.m`` and
+``calcDrawdowns.m``).  They operate on ``pandas`` Series and do
+not introduce new models or research ideas.
 
-Functions
----------
-mean_return
+The key functions provided are:
+
+``mean_return``
     Compute the average return of a series, optionally annualising.
-
-t_statistic
+``t_statistic``
     Compute the t‑statistic of the mean return under the IID
     assumption.
-
-sharpe_ratio
+``sharpe_ratio``
     Compute the (annualised) Sharpe ratio given a series of
     returns.
-
-max_drawdown
+``max_drawdown``
     Compute the maximum drawdown of a return series.
-
-compute_turnover
-    Estimate the turnover of a strategy given portfolio
-    assignments over time.
-
-evaluate_anomaly
+``compute_turnover``
+    Estimate the turnover of a strategy given portfolio assignments.
+``evaluate_anomaly``
     Convenience wrapper that returns a dictionary of common
     metrics for a given return series.
 
-Notes
------
-All functions accept a ``pandas`` Series of periodic returns.  The
-periodicity is inferred via the ``periods_per_year`` parameter
-(default ``12`` for monthly data).  Missing values are dropped
-prior to computation.
+All functions accept a ``pandas`` Series or DataFrame and
+silently drop missing values prior to computation.  No
+heteroskedasticity or autocorrelation adjustments are applied in
+these metrics; users seeking Newey–West corrected statistics
+should use the Fama–MacBeth estimators in
+``aa.asset_pricing.fama_macbeth``.
 """
 
 from __future__ import annotations
 
+from typing import Dict, Any
+
 import numpy as np
 import pandas as pd
 
+__all__ = [
+    "mean_return",
+    "t_statistic",
+    "sharpe_ratio",
+    "max_drawdown",
+    "compute_turnover",
+    "evaluate_anomaly",
+]
+
 
 def mean_return(
-    returns: pd.Series, *, annualize: bool = False, periods_per_year: int = 12
+    returns: pd.Series,
+    *,
+    annualize: bool = False,
+    periods_per_year: int = 12,
 ) -> float:
     """Compute the average return of a series.
 
@@ -69,7 +74,8 @@ def mean_return(
     Returns
     -------
     float
-        The mean return, annualised if requested.
+        The mean return, annualised if requested.  Returns ``nan``
+        if the input series is empty or contains only missing values.
     """
     series = pd.to_numeric(returns, errors="coerce").dropna()
     if series.empty:
@@ -87,12 +93,13 @@ def t_statistic(returns: pd.Series) -> float:
 
     .. math:: \frac{\bar{r}}{s / \sqrt{n}},
 
-    where ``\bar{r}`` is the sample mean, ``s`` is the sample standard
-    deviation (using Bessel's correction) and ``n`` is the number of
-    non‑missing observations.  This implementation makes no attempt to
-    correct for autocorrelation; users requiring Newey–West adjusted
-    statistics should employ the functions in :mod:`aa.asset_pricing.fama_macbeth` or
-    implement their own estimator.
+    where ``\bar{r}`` is the sample mean, ``s`` is the sample
+    standard deviation (using Bessel's correction) and ``n`` is the
+    number of non‑missing observations.  This implementation makes
+    no attempt to correct for autocorrelation; users requiring
+    Newey–West adjusted statistics should employ the functions in
+    :mod:`aa.asset_pricing.fama_macbeth` or implement their own
+    estimator.
 
     Parameters
     ----------
@@ -111,7 +118,7 @@ def t_statistic(returns: pd.Series) -> float:
         return float("nan")
     mean = float(series.mean())
     std = float(series.std(ddof=1))
-    if std == 0:
+    if std == 0 or np.isnan(std):
         return float("nan")
     se = std / np.sqrt(n)
     if se == 0:
@@ -157,7 +164,7 @@ def sharpe_ratio(
     excess = series - risk_free
     mean_excess = float(excess.mean())
     std = float(excess.std(ddof=1))
-    if std == 0:
+    if std == 0 or np.isnan(std):
         return float("nan")
     sr = mean_excess / std * np.sqrt(periods_per_year)
     return sr
@@ -187,7 +194,7 @@ def max_drawdown(returns: pd.Series) -> float:
     if series.empty:
         return 0.0
     # Convert returns into cumulative wealth index
-    cumulative = (1 + series).cumprod()
+    cumulative = (1.0 + series).cumprod()
     running_max = cumulative.cummax()
     drawdowns = (cumulative - running_max) / running_max
     return float(drawdowns.min())
@@ -238,7 +245,10 @@ def compute_turnover(assignments: pd.DataFrame) -> float:
         curr_df = assignments[assignments["date"] == curr_date][["permno"] + cols]
         # Merge to find overlapping securities
         merged = prev_df.merge(
-            curr_df, on="permno", how="inner", suffixes=("_prev", "_curr")
+            curr_df,
+            on="permno",
+            how="inner",
+            suffixes=("_prev", "_curr"),
         )
         if merged.empty:
             # No overlapping securities; turnover is 100%
@@ -259,13 +269,13 @@ def evaluate_anomaly(
     *,
     risk_free: float = 0.0,
     periods_per_year: int = 12,
-) -> dict:
+) -> Dict[str, Any]:
     """Compute a bundle of performance metrics for a return series.
 
-    This helper consolidates the statistics defined above into a single
-    dictionary, facilitating the construction of summary tables.  It
-    does not introduce any additional logic beyond calling the
-    underlying functions.
+    This helper consolidates the statistics defined above into a
+    single dictionary, facilitating the construction of summary
+    tables.  It does not introduce any additional logic beyond
+    calling the underlying functions.
 
     Parameters
     ----------
@@ -280,7 +290,7 @@ def evaluate_anomaly(
     -------
     dict
         Mapping of metric names to their numeric values: ``mean``,
-        ``t_stat``, ``sharpe``, and ``max_dd``.
+        ``t_stat``, ``sharpe`` and ``max_dd``.
     """
     m = mean_return(returns, annualize=False)
     t = t_statistic(returns)

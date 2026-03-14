@@ -10,46 +10,41 @@ breakpoints.  The module supports both equal‑weighted (EW) and
 value‑weighted (VW) returns and produces time‑series and summary
 tables along with a high‑minus‑low series.
 
-MATLAB → Python mapping
------------------------
-The MATLAB pipeline computes portfolio assignments via
-``makeUnivSortInd.m`` and then calls ``runUnivSort.m`` to compute
-portfolio returns and long–short spreads.  The Python function
-``univariate_sort`` below consolidates these steps: it assigns
-bins within each period and computes EW and VW returns directly.  The
-:class:`SortConfig` dataclass mirrors the optional arguments in the
-MATLAB functions (e.g. number of bins, NYSE breakpoints, minimum
-observations).
+The design mirrors the original MATLAB routines but is fully
+Pythonic: the function returns a dictionary of tidy DataFrames
+without side effects.  See :func:`univariate_sort` for details.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 import numpy as np
 import pandas as pd
 
 __all__ = ["SortConfig", "univariate_sort"]
 
-LS_LABEL = "L‑S"  # "L-S" with non-breaking hyphen (U+2011)
+# Non‑breaking hyphen to match MATLAB L-S label
+LS_LABEL = "L‑S"
 
 
 @dataclass(frozen=True)
 class SortConfig:
-    """
-    Configuration for univariate sorts.
+    """Configuration for univariate sorts.
 
     Parameters
     ----------
     n_bins : int, default 5
-        Number of portfolios to form each period (e.g. 10 deciles, 5 quintiles).
+        Number of portfolios to form each period (e.g. 10 deciles,
+        5 quintiles).
     nyse_breaks : bool, default False
-        If True, breakpoints are computed using only NYSE stocks (exchcd == 1).
-        If False, the entire universe is used.
+        If True, breakpoints are computed using only NYSE stocks
+        (``exchcd == 1``).  If False, the entire universe is used.
     min_obs : int, default 20
-        Minimum number of observations required in both the breakpoint universe
-        and the full universe for a period to be sorted.
+        Minimum number of observations required in both the
+        breakpoint universe and the full universe for a period to be
+        sorted.
     """
 
     n_bins: int = 5
@@ -58,12 +53,18 @@ class SortConfig:
 
 
 def _bin_edges(x: pd.Series, n: int) -> np.ndarray:
-    """Compute robust bin edges for an array of signals."""
+    """Compute robust bin edges for an array of signals.
+
+    The routine first attempts to use quantile‑based bins via
+    :func:`pandas.qcut`.  If that fails (e.g. due to too many
+    duplicate values) it falls back to equal‑width bins spanning
+    the range of the data.  Empty inputs yield an empty array.
+    """
     x = pd.to_numeric(x, errors="coerce")
     x = x[np.isfinite(x)]
     if x.empty:
         return np.array([], dtype=float)
-    # Prefer quantile-based bins (like MATLAB ranks -> quantiles)
+    # Prefer quantile‑based bins (like MATLAB ranks -> quantiles)
     try:
         _, bins = pd.qcut(x, q=n, retbins=True, duplicates="drop")
         bins = np.asarray(bins, dtype=float)
@@ -71,7 +72,7 @@ def _bin_edges(x: pd.Series, n: int) -> np.ndarray:
             return bins
     except Exception:
         pass
-    # Fallback: equal-width bins
+    # Fallback: equal‑width bins
     xmin, xmax = float(np.min(x)), float(np.max(x))
     if xmax <= xmin:
         return np.array([], dtype=float)
@@ -86,29 +87,35 @@ def univariate_sort(
     exch: Optional[pd.DataFrame] = None,
     config: SortConfig = SortConfig(),
 ) -> Dict[str, pd.DataFrame]:
-    """
-    Perform univariate portfolio sorts and return time‑series and summary.
+    """Perform univariate portfolio sorts and return time‑series and summary.
 
     Parameters
     ----------
     returns : DataFrame
-        Columns: date, permno, ret
+        Columns: ``date``, ``permno``, ``ret``.
     signal : DataFrame
-        Columns: date, permno, signal
+        Columns: ``date``, ``permno``, ``signal``.
     size : DataFrame, optional
-        Columns: date, permno, me (market equity used for VW weights)
+        Columns: ``date``, ``permno``, ``me`` (market equity used for VW weights).
     exch : DataFrame, optional
-        Columns: date, permno, exchcd (NYSE == 1)
+        Columns: ``date``, ``permno``, ``exchcd`` (NYSE == 1).
     config : SortConfig, optional
-        Sort settings (bins, NYSE breakpoints, min_obs)
+        Sort settings (bins, NYSE breakpoints, minimum observations).
 
     Returns
     -------
-    dict with keys:
-      - ``time_series``: DataFrame with columns date, bin, ret_ew, ret_vw
-      - ``summary``: DataFrame with mean ret_ew/ret_vw by bin and one L‑S row
+    dict
+        Mapping with keys:
+
+        ``"time_series"`` – DataFrame with columns ``date``, ``bin``,
+        ``ret_ew`` and ``ret_vw`` containing the per‑period portfolio
+        returns.
+
+        ``"summary"`` – DataFrame with mean ``ret_ew``/``ret_vw`` by
+        bin and an additional row labelled ``'L‑S'`` representing the
+        high‑minus‑low spread.
     """
-    # Normalize dates
+    # Normalize dates: convert to datetime without time zone
     for df in (returns, signal, size, exch):
         if df is not None and "date" in df.columns:
             df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.tz_localize(
@@ -127,30 +134,35 @@ def univariate_sort(
     # Ensure required cols exist
     if "signal" not in base.columns or "ret" not in base.columns:
         raise KeyError("Merged data must contain 'signal' and 'ret' columns.")
-    # If exchcd missing, treat as non-NYSE
+    # If exchcd missing, treat as non‑NYSE
     if "exchcd" not in base.columns:
         base["exchcd"] = np.nan
 
     def month_sort(g: pd.DataFrame) -> pd.DataFrame:
+        """Sort assets within a single period and compute portfolio returns."""
         g = g.copy()
+        # Determine the universe used to compute breakpoints
         bp_univ = g[g["exchcd"] == 1] if config.nyse_breaks else g
+        # Require sufficient observations in both universes
         if len(bp_univ) < config.min_obs or len(g) < config.min_obs:
             return pd.DataFrame(columns=["date", "bin", "ret_ew", "ret_vw"])
+        # Compute bin edges
         edges = _bin_edges(bp_univ["signal"], config.n_bins)
         if edges.size < 2:
             return pd.DataFrame(columns=["date", "bin", "ret_ew", "ret_vw"])
-        bins_list: list[float] = [
+        bins_list: List[float] = [
             float(v) for v in np.asarray(edges, dtype=float).tolist()
         ]
+        # Assign bin numbers (1‑based indexing)
         g["bin"] = pd.cut(
             g["signal"], bins=bins_list, labels=False, include_lowest=True, right=True
         )
         if g["bin"].isna().all():
             return pd.DataFrame(columns=["date", "bin", "ret_ew", "ret_vw"])
         g["bin"] = (g["bin"].astype("Int64") + 1).astype("Int64")
-        # Equal‑weighted
+        # Equal‑weighted returns per bin
         ew = g.groupby("bin", as_index=False).agg(ret_ew=("ret", "mean"))
-        # Value‑weighted (if 'me' present and finite)
+        # Value‑weighted returns (if size present)
         if size is not None and "me" in g.columns:
             tmp = g[["bin", "ret", "me"]].copy()
             tmp = tmp[np.isfinite(tmp["me"].to_numpy(dtype=float))]
@@ -170,8 +182,8 @@ def univariate_sort(
         out["bin"] = out["bin"].astype("Int64")
         return out[["date", "bin", "ret_ew", "ret_vw"]]
 
-    # Build time‑series
-    pieces: list[pd.DataFrame] = []
+    # Build time‑series by sorting month by month
+    pieces: List[pd.DataFrame] = []
     for dt, g in base.groupby("date", sort=True):
         res = month_sort(g)
         if not res.empty:
@@ -180,9 +192,9 @@ def univariate_sort(
         ts = pd.concat(pieces, ignore_index=True)
     else:
         ts = pd.DataFrame(columns=["date", "bin", "ret_ew", "ret_vw"])
-    # Summary across time
+    # Summary across time: mean returns per bin
     summ = ts.groupby("bin", as_index=False)[["ret_ew", "ret_vw"]].mean()
-    # Add L-S row
+    # Add L‑S row if at least two bins exist
     if (
         not summ.empty
         and pd.api.types.is_integer_dtype(summ["bin"])
@@ -192,7 +204,7 @@ def univariate_sort(
 
         def safe_item(frame: pd.DataFrame, b: int, col: str) -> float:
             s = frame.loc[frame["bin"] == b, col]
-            return float(s.iloc[0]) if len(s) else float(np.nan)
+            return float(s.iloc[0]) if len(s) else float("nan")
 
         ls = pd.DataFrame(
             {

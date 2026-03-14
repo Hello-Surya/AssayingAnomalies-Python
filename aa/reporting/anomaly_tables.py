@@ -8,18 +8,16 @@ scripts that generate comparison tables of anomaly strategies.  By
 accepting Python dictionaries of metrics and converting them into
 ``pandas`` DataFrames, these helpers integrate seamlessly with
 existing reporting tools (e.g. conversion to Markdown or LaTeX via
-:mod:`pandas`).
+`pandas`).
 
 Functions
 ---------
 make_summary_table
     Assemble a tidy DataFrame from a dictionary of metric
     dictionaries, one entry per anomaly.
-
 to_markdown
     Convert a DataFrame into Markdown format using
     ``pandas.DataFrame.to_markdown``.
-
 to_latex
     Convert a DataFrame into LaTeX format using
     ``pandas.DataFrame.to_latex``.
@@ -36,6 +34,8 @@ from __future__ import annotations
 from typing import Dict, Any
 
 import pandas as pd
+
+__all__ = ["make_summary_table", "to_markdown", "to_latex"]
 
 
 def make_summary_table(metrics: Dict[str, Dict[str, Any]]) -> pd.DataFrame:
@@ -83,7 +83,8 @@ def to_markdown(df: pd.DataFrame, *, index: bool = True) -> str:
     Returns
     -------
     str
-        A Markdown representation of the DataFrame.
+        A Markdown representation of the DataFrame.  Returns an empty
+        string if the DataFrame is None or empty.
     """
     if df is None or df.empty:
         return ""
@@ -105,7 +106,8 @@ def to_latex(df: pd.DataFrame, *, index: bool = True) -> str:
     str
         A LaTeX representation of the DataFrame.  Column names are
         used as header labels.  The caller is responsible for adding
-        any required LaTeX table environments.
+        any required LaTeX table environments.  Returns an empty
+        string if the DataFrame is None or empty.
     """
     if df is None or df.empty:
         return ""

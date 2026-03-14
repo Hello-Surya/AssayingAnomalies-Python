@@ -14,7 +14,6 @@ contains LaTeX code compatible with the ``tabular`` environment.
 Usage
 -----
 >>> from aa.reporting.tables import portfolio_returns_table
->>> res = double_sort(...)
 >>> tables = portfolio_returns_table(res['summary'], value_weighted=False)
 >>> print(tables['markdown'])
 >>> print(tables['latex'])
@@ -32,7 +31,11 @@ from typing import Dict, Any
 
 import pandas as pd
 
-__all__ = ["portfolio_returns_table", "high_low_table", "fama_macbeth_table"]
+__all__ = [
+    "portfolio_returns_table",
+    "high_low_table",
+    "fama_macbeth_table",
+]
 
 
 def _format_table(df: pd.DataFrame) -> Dict[str, str]:
@@ -55,7 +58,7 @@ def _format_table(df: pd.DataFrame) -> Dict[str, str]:
         Dictionary with keys ``markdown`` and ``latex`` containing the
         formatted table in Markdown and LaTeX, respectively.
     """
-    # Copy the DataFrame and round floating-point columns for readability
+    # Copy the DataFrame and round floating‑point columns for readability
     fmt_df = df.copy()
     for col in fmt_df.columns:
         if pd.api.types.is_float_dtype(fmt_df[col]):
@@ -89,8 +92,7 @@ def portfolio_returns_table(
     *,
     value_weighted: bool = False,
 ) -> Dict[str, str]:
-    """
-    Generate a 2D portfolio return table from a double sort summary.
+    """Generate a 2D portfolio return table from a double sort summary.
 
     Parameters
     ----------
@@ -135,8 +137,7 @@ def high_low_table(
     value_weighted: bool = False,
     average: bool = True,
 ) -> Dict[str, str]:
-    """
-    Create a summary table for high–low spreads.
+    """Create a summary table for high–low spreads.
 
     Parameters
     ----------
@@ -172,44 +173,37 @@ def high_low_table(
 def fama_macbeth_table(
     fm_results: Dict[str, Any],
 ) -> Dict[str, str]:
-    """
-    Format Fama–MacBeth regression results into a table.
+    """Format Fama–MacBeth regression results into a table.
 
     Parameters
     ----------
     fm_results : dict
         Output of :func:`aa.asset_pricing.fama_macbeth_full`.  Must
-        include keys ``lambdas``, ``se``, ``tstat`` and ``n_obs``.
+        contain keys ``'lambda'``, ``'se'``, ``'t'`` and ``'n'``.
 
     Returns
     -------
     dict
-        Formatted table containing the average coefficients
-        (``lambda``), Newey–West standard errors (``se``), t‑statistics
-        (``t``) and the number of observation periods (``n_obs``).
-
-    Notes
-    -----
-    Coefficients and standard errors are rounded to three decimal
-    places.  t‑statistics are computed externally and therefore
-    passed through without additional rounding here.
+        Dictionary with keys ``markdown`` and ``latex``.  The table
+        has rows for the intercept and each regressor and columns for
+        the point estimates (``lambda``), Newey–West standard errors
+        (``se``), t‑statistics (``t``) and the number of cross‑sectional
+        observation periods (``n``).
     """
-    lambdas = fm_results.get("lambdas")
-    se = fm_results.get("se")
-    tstat = fm_results.get("tstat")
-    n_obs = fm_results.get("n_obs")
-    if not all(obj is not None for obj in (lambdas, se, tstat, n_obs)):
-        raise ValueError(
-            "fm_results must include 'lambdas', 'se', 'tstat' and 'n_obs' entries"
-        )
+    required_keys = {"lambda", "se", "t", "n"}
+    if not required_keys.issubset(fm_results.keys()):
+        missing = required_keys - set(fm_results.keys())
+        raise KeyError(f"fm_results missing keys: {missing}")
+    # Build DataFrame
     df = pd.DataFrame(
         {
-            "lambda": lambdas,
-            "se": se,
-            "t": tstat,
-            "n_obs": n_obs,
+            "lambda": fm_results["lambda"],
+            "se": fm_results["se"],
+            "t": fm_results["t"],
+            "n": fm_results["n"],
         }
     )
-    # Order rows by index
-    df = df.reindex(df.index.tolist())
+    # Ensure order of coefficients (const first)
+    idx = [c for c in df.index if c == "const"] + [c for c in df.index if c != "const"]
+    df = df.loc[idx]
     return _format_table(df)

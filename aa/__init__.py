@@ -1,53 +1,33 @@
 """
-Assaying Anomalies Python Package
-================================
+Top‑level package for the Assaying Anomalies Python port.
 
-This package contains modules for constructing anomaly signals, forming
-portfolios, running cross‑sectional regressions and producing
-publication‑quality tables.  It mirrors the structure of the MATLAB
-Assaying Anomalies toolkit by Novy‑Marx & Velikov while adhering to
-Pythonic design principles:
+This package mirrors the structure of the original MATLAB library
+(`AssayingAnomalies`) but provides a fully Pythonic API built on
+``pandas``.  Subpackages expose functions for constructing
+characteristics, forming portfolios, running cross‑sectional
+regressions and producing formatted tables.  All functions are
+stateless and operate on tidy data structures.
 
-* Functions are pure, with no global state or hidden side effects.
-* Modules are fully typed and documented.
-* Data flows through pandas ``DataFrame`` objects using tidy
-  conventions: each row represents an observation and each column a
-  variable.
-* Pipelines are composable – the output of one stage feeds directly
-  into the next.
+Importing the top‑level package re‑exports the major subpackages:
 
-Subpackages and modules
------------------------
+* :mod:`aa.asset_pricing` – univariate/double sorts and
+  Fama–MacBeth regressions.
+* :mod:`aa.analysis` – performance metrics, large‑scale anomaly
+  evaluation and ranking utilities.
+* :mod:`aa.reporting` – helper functions to convert results into
+  Markdown and LaTeX tables.
 
-The top‑level ``aa`` package exposes the following submodules:
-
-``signals``
-    Construction of firm‑level anomaly signals (size, book‑to‑market,
-    momentum, investment and profitability).  Each function accepts
-    raw CRSP/Compustat data and returns a DataFrame of lagged
-    characteristics.
-
-``asset_pricing``
-    Portfolio sorts, characteristic‑managed portfolios and
-    cross‑sectional regressions.  Includes univariate and double
-    portfolio sorts and Fama–MacBeth estimators.
-
-``reporting``
-    Utilities for producing Markdown and LaTeX tables suitable for
-    inclusion in academic papers or reports.
-
-In addition to the original modules, milestone 4 introduces several
-new modules: ``aa.regime`` for regime analysis, ``aa.robustness`` for
-systematic sensitivity checks, ``aa.diagnostics`` for stability
-diagnostics, ``aa.multiple_testing`` for multiple‑testing controls, and
-``aa.simulation`` for placebo experiments.  These modules are not
-imported by default but can be accessed directly via ``aa.regime`` and
-similarly for others.
+New in milestone 7 is the :mod:`aa.analysis.anomaly_pipeline`
+which provides a convenient interface for evaluating many anomaly
+signals simultaneously.  See the documentation of that module for
+details.
 """
 
-from . import asset_pricing, reporting  # noqa: F401  # re-export subpackages
+from . import asset_pricing, analysis, reporting, validation  # noqa: F401
 
 __all__ = [
     "asset_pricing",
+    "analysis",
     "reporting",
+    "validation",
 ]
