@@ -14,10 +14,7 @@ MATLAB outputs and the expected numerical differences arising from
 floating‑point computations.
 """
 
-from __future__ import annotations
-
 from typing import Dict, Any, Tuple
-
 import pandas as pd
 
 __all__ = ["compare_metrics", "parity_ok"]
