@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.9", "3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .
-          pip install black ruff mypy pytest pytest-cov scipy-stubs
+          pip install black ruff mypy pytest pytest-cov scipy-stubs build
 
       - name: Lint
         run: |
@@ -38,4 +38,16 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pytest -q
+          python -m pytest -q --cov=aa --cov-report=term-missing
+
+      - name: Build distributions
+        run: |
+          # Ensure distributions can be built successfully
+          python -m build --sdist --wheel
+          ls -l dist
+
+      - name: Check package metadata
+        run: |
+          # Use twine to validate the metadata.  twine is installed implicitly with build.
+          python -m pip install --upgrade twine
+          python -m twine check dist/*

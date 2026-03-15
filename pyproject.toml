@@ -1,17 +1,53 @@
+##
+## pyproject.toml
+##
+## This file contains the metadata and build configuration for the
+## Assaying Anomalies Python package.  It follows the PEP 621
+## specification for declarative project metadata and configures
+## setuptools as the build backend.  The configuration here is
+## designed for a public, installable release on PyPI.
+##
+
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+# Use setuptools with an isolated build environment.  The
+# `[project]` table below declares our dependencies and metadata.
+requires = ["setuptools>=61.0", "wheel", "build"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "assayinganomalies"
-version = "0.1.0"
+# The name that will appear on PyPI.  Hyphens are allowed here and
+# will be normalised by pip.  The importable package remains
+# `aa` as configured in the setuptools table below.
+name = "assaying-anomalies"
+
+# Semantic version number.  This release marks the first stable
+# open‑source version of the library.
+version = "1.0.0"
+
+# Short summary of the package.  Keep it succinct but descriptive.
 description = "Python translation of the Assaying Anomalies MATLAB library for anomaly evaluation and portfolio sorting"
+
+# Long description will be read from the README file when
+# packaging.  This ensures the PyPI page mirrors our README.
+readme = "README.md"
+
+# Authors and maintainers.  Feel free to update the email address
+# in future releases.
 authors = [
     { name = "Assaying Anomalies Development Team", email = "maintainers@example.com" }
 ]
-license = "MIT"
-readme = "README.md"
+
+# Choose the same permissive licence as the original MATLAB
+# implementation.  The full text is stored in the LICENSE file.
+license = { text = "MIT" }
+
+# Minimum supported Python version.  The library makes use of
+# features introduced in Python 3.9 (such as type annotations).
 requires-python = ">=3.9"
+
+# Runtime dependencies.  These packages are required by the
+# library at import time.  Versions have been chosen to balance
+# stability and modern features.
 dependencies = [
     "pandas>=2.0",
     "numpy>=1.21",
@@ -24,12 +60,78 @@ dependencies = [
     "polars>=0.18"
 ]
 
+# Additional project links that will appear on the package's
+# PyPI page.  These can be updated as the project evolves.
 [project.urls]
 Homepage = "https://github.com/Hello-Surya/AssayingAnomalies-Python"
 Documentation = "https://github.com/Hello-Surya/AssayingAnomalies-Python/tree/main/docs"
+Source = "https://github.com/Hello-Surya/AssayingAnomalies-Python"
+BugTracker = "https://github.com/Hello-Surya/AssayingAnomalies-Python/issues"
 
+# Keywords help users discover the package when searching on
+# PyPI.  They should be lower‑case and separated by commas.
+keywords = [
+    "finance",
+    "asset pricing",
+    "anomalies",
+    "fama macbeth",
+    "portfolio sorts",
+    "cross-sectional return predictors"
+]
+
+# Classifiers provide metadata used by packaging tools and
+# PyPI.  See https://pypi.org/classifiers/ for the full list.
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Finance"
+]
+
+# Optional dependencies used for development.  They are not
+# installed by default but can be requested via extras (e.g.
+# `pip install assaying-anomalies[dev]`).
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1",
+    "black>=23.0",
+    "mypy>=1.0",
+    "build>=1.0"
+]
+
+# Define the importable packages and mapping for setuptools.  The
+# `aa` package lives in the `aa` directory in the repository root.
 [tool.setuptools]
 packages = ["aa"]
 
 [tool.setuptools.package-dir]
 aa = "aa"
+
+# Configuration for Ruff linter.  The repository also includes a
+# `.ruff.toml` file for more granular rules, but these minimal
+# settings ensure that Ruff will respect our pyproject configuration.
+[tool.ruff]
+line-length = 88
+
+# Configuration for Black.  Keep formatting consistent across the
+# codebase.
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311"]
+
+# Mypy configuration.  Strict type checking can be enabled by
+# passing `--strict` when invoking mypy.  Here we specify that
+# missing imports are ignored to avoid stubs for optional
+# dependencies.
+[tool.mypy]
+ignore_missing_imports = true
+show_error_codes = true

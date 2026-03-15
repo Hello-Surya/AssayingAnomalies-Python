@@ -1,0 +1,95 @@
+Metadata-Version: 2.4
+Name: assayinganomalies
+Version: 0.1.0
+Summary: Python translation of the Assaying Anomalies MATLAB library for anomaly evaluation and portfolio sorting
+Author-email: Assaying Anomalies Development Team <maintainers@example.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/Hello-Surya/AssayingAnomalies-Python
+Project-URL: Documentation, https://github.com/Hello-Surya/AssayingAnomalies-Python/tree/main/docs
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0
+Requires-Dist: numpy>=1.21
+Requires-Dist: scipy>=1.7
+Requires-Dist: statsmodels>=0.14
+Requires-Dist: matplotlib>=3.5
+Requires-Dist: seaborn>=0.13
+Requires-Dist: scikit-learn>=1.3
+Requires-Dist: pyarrow>=10.0
+Requires-Dist: polars>=0.18
+
+# Assaying Anomalies – Python Library
+
+The **Assaying Anomalies** project provides a rigorous protocol for evaluating cross‑sectional stock return predictors.  This repository contains a complete Python translation of the original MATLAB toolkit by Novy‑Marx & Velikov.  The aim is strict functional fidelity: all major features of the MATLAB library have been ported to Python, including anomaly signal construction, portfolio sorts, Fama–MacBeth regressions, evaluation metrics, tables, figures and an end‑to‑end replication pipeline.
+
+## Features
+
+* Compute standard anomaly signals (size, value/book‑to‑market, momentum, investment and profitability) using pure functions.
+* Sort stocks into equal‑ and value‑weighted portfolios and construct high‑minus‑low spreads【391052465484637†L0-L115】.
+* Run two‑pass Fama–MacBeth regressions with automatic Newey–West standard errors【795186362666985†L0-L23】.
+* Evaluate multiple signals simultaneously and produce performance metrics (mean return, t‑statistic, Sharpe ratio, drawdown) for each.
+* Generate publication‑quality tables and figures replicating those in the MATLAB documentation.
+* Orchestrate the full anomaly pipeline via command‑line scripts without writing any custom code.
+* Designed for reproducible research: deterministic behaviours, seed control and validation utilities.
+
+## Installation
+
+The package requires Python ≥ 3.9 and standard scientific libraries (`pandas`, `numpy`, `statsmodels`, `matplotlib`, etc.).  To install from a checked‑out copy of the repository:
+
+```bash
+git clone https://github.com/Hello‑Surya/AssayingAnomalies‑Python.git
+cd AssayingAnomalies‑Python
+pip install -e .
+```
+
+Installing in editable mode (`-e`) allows you to run the examples and modify the code locally.  If you simply want to use the library, a wheel may be published on PyPI in the future – then you can run `pip install assayinganomalies`.
+
+To install development dependencies (for testing and linting), run:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage overview
+
+The `docs/usage_guide.md` file contains a detailed walkthrough with code samples.  At a high level the workflow is:
+
+1. Prepare a panel of monthly returns and firm‑level fundamentals.  The sample data must include a `date` column (period end), a `permno` column (unique firm identifier), and a return column (e.g. `ret`).  For value and profitability signals you also need book equity (`be`), total assets (`at`) and operating profitability (`op`), linked to `permno` by fiscal year end (`datadate`).
+2. Compute anomaly signals using the functions in `aa.signals`.  For example:
+
+   ```python
+   from aa.signals import compute_size_signal
+   size = compute_size_signal(crsp[["date", "permno", "me"]])
+   ```
+
+3. Merge the signals with your returns and market equity to form a complete panel.
+4. Perform univariate sorts and compute high‑minus‑low spreads using `aa.asset_pricing.univariate_sort` with a `SortConfig`.  The function returns both time‑series and summary tables.
+5. Optionally run cross‑sectional regressions using `aa.asset_pricing.fama_macbeth_full` to estimate risk prices and their t‑statistics.
+6. For large‑scale analysis, call `aa.analysis.anomaly_pipeline.evaluate_signals` to evaluate multiple signals in one call and obtain a dictionary of performance metrics.
+7. Use `scripts/run_full_library_replication.py` to orchestrate the entire workflow on real data.  The script accepts command‑line arguments to specify the input file, which signals to compute, how many portfolios to form and where to write the outputs.
+
+## Examples
+
+The `examples/` folder contains two self‑contained scripts:
+
+* `basic_usage.py` – shows how to generate synthetic CRSP‑style data, compute the size signal, perform a univariate portfolio sort and run a Fama–MacBeth regression on the signal.
+* `demo_assaying_anomalies_pipeline.py` – synthesises CRSP and Compustat data for multiple stocks, computes all five anomaly signals, evaluates them with `evaluate_signals` and performs a multi‑signal Fama–MacBeth regression.  Because the data are random, the results have no economic meaning; the script is for instructional purposes.
+
+Run an example with:
+
+```bash
+python examples/basic_usage.py
+python examples/demo_assaying_anomalies_pipeline.py
+```
+
+## Documentation
+
+Additional documentation is located in the `docs/` directory:
+
+* `docs/architecture.md` – high‑level overview of the system design and key modules.
+* `docs/translation_completion_report.md` – a mapping of MATLAB functions to their Python equivalents and notes on translation coverage.
+* `docs/usage_guide.md` – this usage guide with more code examples.
+
+## Licence
+
+This project is released under the MIT licence.  See the `LICENSE` file for details.
