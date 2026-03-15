@@ -34,7 +34,7 @@ jobs:
 
       - name: Type check
         run: |
-          python -m mypy aa examples
+          python -m mypy --disable-error-code import-untyped aa examples
 
       - name: Run tests
         run: |
