@@ -1,16 +1,21 @@
 <!--
-    README for the Assaying Anomalies Python library.
+        README for the Assaying Anomalies Python library.
 
-    This document is intended to be both the landing page on GitHub and
-    the long description displayed on PyPI.  It provides an overview
-    of the project, installation instructions, feature highlights and
-    links to further documentation.  The badges at the top reflect
-    build status, latest PyPI release and licence.
--->
+        This document is intended to be both the landing page on GitHub and
+        the long description displayed on PyPI.  It provides an overview
+        of the project, installation instructions, feature highlights and
+        links to further documentation.  The badges at the top reflect
+        build status, latest PyPI release and licence.
+    -->
 
 # Assaying Anomalies – Python Library
 
+<<<<<<< HEAD
 ![CI](https://github.com/Hello-Surya/AssayingAnomalies-Python/actions/workflows/tests.yml/badge.svg)
+=======
+![CI](https://github.com/Hello-Surya/AssayingAnomalies-
+Python/actions/workflows/tests.yml/badge.svg)
+>>>>>>> 26b81a9 (Milestone 12: add reproducibility infrastructure, synthetic dataset generator, integration test, release tooling, and developer docs)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -29,7 +34,8 @@ pipeline.
 The package requires Python ≥ 3.9 and relies on standard scientific
 libraries such as `pandas`, `numpy`, `statsmodels` and `matplotlib`.
 
-To install the latest stable release from [PyPI](https://pypi.org/project/assaying-anomalies/), run:
+To install the latest stable release from
+[PyPI](https://pypi.org/project/assaying-anomalies/), run:
 
 ```bash
 pip install assaying-anomalies
@@ -127,6 +133,57 @@ bugs, propose improvements, run tests and adhere to the project’s
 coding standards.  In brief, we use `black` for formatting, `ruff` for
 linting and `mypy` for type checking.  Unit tests live in the
 `tests/` directory and can be run with `pytest`.
+
+## Reproducible environments
+
+To ensure that results can be reproduced and that collaborators are
+working in identical setups, we provide two environment specification
+files: `environment.yml` and `requirements-dev.txt`.  These files pin
+the versions of Python and all runtime and development dependencies.
+
+To create the environment using conda, run:
+
+```bash
+conda env create -f environment.yml
+conda activate assaying-anomalies-env
+```
+
+Alternatively, you can install the development dependencies with pip:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+These files mirror the dependencies defined in the project's
+`pyproject.toml`【753162988832289†L16-L26】 and include additional tooling such as
+`pytest`, `black` and `mypy` for development【753162988832289†L49-L59】.
+
+## Synthetic data testing
+
+Users who do not have access to WRDS can still experiment with the
+library using synthetic data.  The module `aa/data/synthetic_generator.py`
+implements a `generate_synthetic_panel` function that simulates
+panel data of stock returns, market equity and a predictive signal.
+The integration test in `tests/test_full_pipeline.py` uses this
+generator to run a complete anomaly pipeline – univariate sorts,
+portfolio return calculation and Fama–MacBeth regressions – without
+any external data.  This makes it easy to verify the installation and
+understand the API before working with real CRSP/Compustat inputs.
+
+## Repository maintenance and release tools
+
+Several scripts under `scripts/` help maintain the health of the
+repository and produce reproducible releases:
+
+* **`scripts/run_repo_diagnostics.py`** – Runs the test suite, checks
+  that documentation and environment files exist and attempts to import
+  the package.  Use this script to validate the repository before
+  submitting a pull request.
+* **`scripts/create_versioned_release.py`** – Bumps the version number
+  in `pyproject.toml`, builds source and wheel distributions with
+  `python -m build`, archives the release and generates a release notes
+  template.  This script streamlines the process of preparing a new
+  PyPI release.
 
 ## Licence
 
