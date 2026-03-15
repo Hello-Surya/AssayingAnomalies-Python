@@ -25,7 +25,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .
-          pip install black ruff mypy pytest pytest-cov scipy-stubs build
+          pip install black ruff mypy pytest pytest-cov build twine
 
       - name: Lint
         run: |
@@ -42,12 +42,9 @@ jobs:
 
       - name: Build distributions
         run: |
-          # Ensure distributions can be built successfully
           python -m build --sdist --wheel
           ls -l dist
 
       - name: Check package metadata
         run: |
-          # Use twine to validate the metadata.  twine is installed implicitly with build.
-          python -m pip install --upgrade twine
           python -m twine check dist/*
