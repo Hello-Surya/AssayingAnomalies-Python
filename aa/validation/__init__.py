@@ -1,12 +1,19 @@
-"""
-Validation subpackage for Assaying Anomalies.
+"""Validation subpackage for the Assaying Anomalies port.
 
-This namespace provides functions to compare Python outputs against
-MATLAB benchmarks or other reference results.  Use these helpers
-to verify that ported algorithms produce values within an
-acceptable tolerance of their original counterparts.
+This ``__init__.py`` file exposes the functions defined in
+``output_consistency.py`` at the package level for convenience.
 """
 
-from .matlab_parity import compare_metrics, parity_ok
+from .output_consistency import (
+    check_portfolio_returns_reproducibility,
+    check_anomaly_ranking_stability,
+    check_fama_macbeth_consistency,
+    check_summary_table_consistency,
+)
 
-__all__ = ["compare_metrics", "parity_ok"]
+__all__ = [
+    "check_portfolio_returns_reproducibility",
+    "check_anomaly_ranking_stability",
+    "check_fama_macbeth_consistency",
+    "check_summary_table_consistency",
+]

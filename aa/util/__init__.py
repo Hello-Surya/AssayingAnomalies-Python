@@ -1,18 +1,19 @@
-"""Utility functions and helpers for the aa package.
+"""Utility subpackage for the Assaying Anomalies port.
 
-This package aggregates a handful of helpers used by various
-components of the Assaying Anomalies Python port.  Functions are
-explicitly imported here to provide a clean public API.  Refer to
-individual submodules for detailed documentation.
+This ``__init__.py`` file exposes the functions defined in
+``reproducibility.py`` at the package level for convenience.
 """
 
-from .ids import normalize_permno, keep_common_equity
-from .statistics import winsorize, rank_series, lag
+from .reproducibility import (
+    set_random_seed,
+    get_experiment_hash,
+    get_reproducibility_metadata,
+    log_reproducibility_metadata,
+)
 
 __all__ = [
-    "normalize_permno",
-    "keep_common_equity",
-    "winsorize",
-    "rank_series",
-    "lag",
+    "set_random_seed",
+    "get_experiment_hash",
+    "get_reproducibility_metadata",
+    "log_reproducibility_metadata",
 ]

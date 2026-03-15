@@ -22,11 +22,12 @@ adopting idiomatic Python data structures (primarily `pandas`
 
 | MATLAB component | Python module/script | Notes |
 |------------------|----------------------|-------|
-| `use_library.m`  | `scripts/run_full_library_replication.py` and `scripts/reproduce_assaying_anomalies.py` | These scripts encapsulate the end‑to‑end workflow of evaluating anomaly signals, ranking anomalies and generating all summary tables and figures.  The `reproduce_assaying_anomalies.py` script simply forwards its arguments to `run_full_library_replication.py` using a subprocess call, so that the entire pipeline can be invoked with a single command. |
+| `use_library.m`  | `scripts/run_full_library_replication.py` and \
+`scripts/reproduce_assaying_anomalies.py` | These scripts encapsulate the end‑to‑end workflow of evaluating anomaly signals, ranking anomalies and generating all summary tables and figures.  The `reproduce_assaying_anomalies.py` script simply forwards its arguments to `run_full_library_replication.py` using a subprocess call, so that the entire pipeline can be invoked with a single command. |
 | Table generation in MATLAB (`paper_tables.m` and related functions) | `aa/reporting/paper_tables.py` | Provides high‑level functions for assembling performance summaries, long–short statistics, ranking tables, t‑statistics tables and Sharpe ratio tables.  These functions wrap lower‑level utilities in `aa.reporting.library_tables` and operate on dictionaries returned by the evaluation pipeline. |
 | Plotting scripts in MATLAB (`paper_figures.m`, etc.) | `aa/vis/paper_figures.py` | Contains functions to create cumulative return plots, performance comparisons, histograms of return distributions and portfolio spread bar charts using `matplotlib`.  The figures mirror those produced by the MATLAB toolkit. |
 | Output export routines | `aa/reporting/export_utils.py` | Centralises all file writing for tables and figures.  Tables can be exported to CSV, Markdown or LaTeX via `export_table` and `export_tables`, while figures are saved via `export_figure`. |
-| Robustness and large‑scale evaluation scripts | Already implemented in previous milestones | These components were completed in earlier milestones (see other documentation) and are reused by the final replication pipeline. |
+| Robustness and large‑scale evaluation scripts | Already implemented in previous milestones | These components were completed in earlier milestones and are reused by the final replication pipeline. |
 
 ## Completed translations
 
@@ -92,7 +93,8 @@ forwards its arguments.  It exists to mirror the MATLAB
 entry point.  For example:
 
 ```bash
-python scripts/reproduce_assaying_anomalies.py --input my_panel.parquet --output outputs/
+python scripts/reproduce_assaying_anomalies.py --input my_panel.parquet \
+    --output outputs/
 ```
 
 will perform the same operations with default settings.
@@ -105,3 +107,43 @@ additional guidance.  Please ensure that any new code preserves
 backwards compatibility with the existing API and does not
 introduce new modelling assumptions unless explicitly required by a
 future milestone.
+
+## Translation coverage
+
+To monitor progress on the MATLAB‑to‑Python port, a coverage audit
+script (`scripts/check_translation_coverage.py`) has been added.  It
+recursively scans the MATLAB source tree for `.m` files and the
+Python source tree for `.py` modules, attempts to match them using a
+simple name transformation (lowercase, underscores replacing spaces
+and hyphens) and writes a report summarising the results.  The
+generated report lists how many MATLAB files have direct Python
+equivalents, and which remain to be translated.  Running this tool
+periodically helps ensure no part of the original library is
+overlooked.  See `docs/validation_process.md` for details.
+
+## Validation procedures
+
+Deterministic behaviour and reproducibility are crucial for
+confidence in the replication.  This milestone introduces two
+utility modules – `aa.util.reproducibility` and
+`aa.validation.output_consistency` – to support those goals.  The
+former centralises random seed initialisation and metadata capture,
+while the latter provides functions to compare outputs from separate
+runs or against the MATLAB results.  Developers are encouraged to
+set a fixed random seed at the start of every experiment and to
+record the resulting metadata alongside their outputs.  When
+comparing results, the consistency functions will report boolean
+success/failure for portfolio returns, anomaly rankings,
+Fama–MacBeth regression estimates and summary tables.
+
+## Verifying parity with MATLAB
+
+After running the Python pipeline on a particular dataset, the
+resulting tables and figures can be compared against those produced
+by the MATLAB scripts.  Export the MATLAB outputs to CSV or another
+machine‑readable format, load them into pandas, and apply the
+consistency checks provided in `aa.validation.output_consistency`.  If
+differences are discovered, they may indicate an error in the
+translation or a discrepancy in data preprocessing.  Use the
+reporting functions and reproducibility metadata to trace and
+diagnose such issues.
