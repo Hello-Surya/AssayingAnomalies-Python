@@ -6,8 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "assayinganomalies"
 version = "0.1.0"
 description = "Python translation of the Assaying Anomalies MATLAB library for anomaly evaluation and portfolio sorting"
-authors = [ { name = "Assaying Anomalies Development Team", email = "maintainers@example.com" } ]
-license = { text = "MIT" }
+authors = [
+    { name = "Assaying Anomalies Development Team", email = "maintainers@example.com" }
+]
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -23,5 +25,11 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/Hello-Surya/AssayingAnomalies-Python"
-"Documentation" = "https://github.com/Hello-Surya/AssayingAnomalies-Python/tree/main/docs"
+Homepage = "https://github.com/Hello-Surya/AssayingAnomalies-Python"
+Documentation = "https://github.com/Hello-Surya/AssayingAnomalies-Python/tree/main/docs"
+
+[tool.setuptools]
+packages = ["aa"]
+
+[tool.setuptools.package-dir]
+aa = "aa"
