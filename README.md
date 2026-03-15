@@ -10,9 +10,9 @@
 
 # Assaying Anomalies – Python Library
 
-[![Build Status](https://github.com/Hello-Surya/AssayingAnomalies-Python/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Hello-Surya/AssayingAnomalies-Python/actions/workflows/tests.yml)
-[![PyPI Version](https://img.shields.io/pypi/v/assaying-anomalies.svg?color=blue)](https://pypi.org/project/assaying-anomalies/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+![CI](https://github.com/Hello-Surya/AssayingAnomalies-Python/actions/workflows/tests.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 The **Assaying Anomalies** project provides a rigorous, open‑source
 protocol for evaluating cross‑sectional stock return predictors.  This
