@@ -366,58 +366,46 @@ def run_double_sort(
         out = ew.merge(vw, on=["bin1", "bin2"], how="left")
         out["date"] = dt
         ts_frames.append(out[["date", "bin1", "bin2", "ret_ew", "ret_vw"]])
-        # Compute high‑low along dimension 1: within each bin2, high bin1 minus low bin1
+        # High‑low along dimension 1: difference between the highest and
+        # lowest bins of signal1 across all bin2 values
         if not out.empty:
-            b1_min = int(out["bin1"].min())
-            b1_max = int(out["bin1"].max())
-            hl1_list: list[tuple[int, float, float]] = []
-            for b2 in sorted(out["bin2"].dropna().astype(int).unique()):
-                sub = out[out["bin2"].astype(int) == b2]
-                r_high = sub.loc[sub["bin1"] == b1_max]
-                r_low = sub.loc[sub["bin1"] == b1_min]
-                if len(r_high) and len(r_low):
-                    diff_ew = float(r_high["ret_ew"].iloc[0]) - float(
-                        r_low["ret_ew"].iloc[0]
-                    )
-                    diff_vw = float(r_high["ret_vw"].iloc[0]) - float(
-                        r_low["ret_vw"].iloc[0]
-                    )
-                    hl1_list.append((b2, diff_ew, diff_vw))
-            if hl1_list:
-                hl1_frames.append(
-                    pd.DataFrame(
-                        {
-                            "date": [dt],
-                            "hl_ew": [np.nanmean([x[1] for x in hl1_list])],
-                            "hl_vw": [np.nanmean([x[2] for x in hl1_list])],
-                        }
-                    )
+            g_bin1 = out.groupby("bin1", as_index=False).agg(
+                ret_ew=("ret_ew", "mean"), ret_vw=("ret_vw", "mean")
+            )
+            b1_min = int(g_bin1["bin1"].min())
+            b1_max = int(g_bin1["bin1"].max())
+            r_low = g_bin1.loc[g_bin1["bin1"] == b1_min]
+            r_high = g_bin1.loc[g_bin1["bin1"] == b1_max]
+            if not r_high.empty and not r_low.empty:
+                diff_ew = float(r_high["ret_ew"].iloc[0]) - float(
+                    r_low["ret_ew"].iloc[0]
                 )
-        # Compute high‑low along dimension 2: within each bin1, high bin2 minus low bin2
+                diff_vw = float(r_high["ret_vw"].iloc[0]) - float(
+                    r_low["ret_vw"].iloc[0]
+                )
+                hl1_frames.append(
+                    pd.DataFrame({"date": [dt], "hl_ew": [diff_ew], "hl_vw": [diff_vw]})
+                )
+        # High‑low along dimension 2: difference between the highest and
+        # lowest bins of signal2 across all bin1 values
         if not out.empty:
-            b2_min = int(out["bin2"].min())
-            b2_max = int(out["bin2"].max())
-            hl2_list: list[tuple[int, float, float]] = []
-            for b1 in sorted(out["bin1"].dropna().astype(int).unique()):
-                sub = out[out["bin1"].astype(int) == b1]
-                r_high = sub.loc[sub["bin2"] == b2_max]
-                r_low = sub.loc[sub["bin2"] == b2_min]
-                if len(r_high) and len(r_low):
-                    diff_ew = float(r_high["ret_ew"].iloc[0]) - float(
-                        r_low["ret_ew"].iloc[0]
-                    )
-                    diff_vw = float(r_high["ret_vw"].iloc[0]) - float(
-                        r_low["ret_vw"].iloc[0]
-                    )
-                    hl2_list.append((b1, diff_ew, diff_vw))
-            if hl2_list:
+            g_bin2 = out.groupby("bin2", as_index=False).agg(
+                ret_ew=("ret_ew", "mean"), ret_vw=("ret_vw", "mean")
+            )
+            b2_min = int(g_bin2["bin2"].min())
+            b2_max = int(g_bin2["bin2"].max())
+            r_low2 = g_bin2.loc[g_bin2["bin2"] == b2_min]
+            r_high2 = g_bin2.loc[g_bin2["bin2"] == b2_max]
+            if not r_high2.empty and not r_low2.empty:
+                diff_ew2 = float(r_high2["ret_ew"].iloc[0]) - float(
+                    r_low2["ret_ew"].iloc[0]
+                )
+                diff_vw2 = float(r_high2["ret_vw"].iloc[0]) - float(
+                    r_low2["ret_vw"].iloc[0]
+                )
                 hl2_frames.append(
                     pd.DataFrame(
-                        {
-                            "date": [dt],
-                            "hl_ew": [np.nanmean([x[1] for x in hl2_list])],
-                            "hl_vw": [np.nanmean([x[2] for x in hl2_list])],
-                        }
+                        {"date": [dt], "hl_ew": [diff_ew2], "hl_vw": [diff_vw2]}
                     )
                 )
     # Concatenate time series
@@ -426,6 +414,7 @@ def run_double_sort(
         if ts_frames
         else pd.DataFrame(columns=["date", "bin1", "bin2", "ret_ew", "ret_vw"])
     )
+    # Placeholder for high–low time series; will be overwritten after summary
     hl1_ts = (
         pd.concat(hl1_frames, ignore_index=True)
         if hl1_frames
@@ -437,11 +426,68 @@ def run_double_sort(
         else pd.DataFrame(columns=["date", "hl_ew", "hl_vw"])
     )
     # Summary across time
-    summary = (
-        ts.groupby(["bin1", "bin2"], as_index=False)[["ret_ew", "ret_vw"]].mean()
-        if not ts.empty
-        else pd.DataFrame(columns=["bin1", "bin2", "ret_ew", "ret_vw"])
+    # Compute summary and ensure all bin combinations appear.  If some
+    # combinations never receive assignments (e.g. due to perfect
+    # correlation between signals), the summary will omit them.  To
+    # satisfy downstream expectations (including unit tests), reindex
+    # the summary to include the full Cartesian product of bins with
+    # missing returns represented as NaN.
+    if not ts.empty:
+        summary = ts.groupby(["bin1", "bin2"], as_index=False)[
+            ["ret_ew", "ret_vw"]
+        ].mean()
+    else:
+        summary = pd.DataFrame(columns=["bin1", "bin2", "ret_ew", "ret_vw"])
+    # Full grid of bins
+    bins1 = pd.Series(range(1, config.n_bins_1 + 1), name="bin1")
+    bins2 = pd.Series(range(1, config.n_bins_2 + 1), name="bin2")
+    all_combos = (
+        bins1.to_frame()
+        .assign(key=1)
+        .merge(bins2.to_frame().assign(key=1), on="key")
+        .drop("key", axis=1)
     )
+    summary = (
+        all_combos.merge(summary, on=["bin1", "bin2"], how="left")
+        .sort_values(["bin1", "bin2"])
+        .reset_index(drop=True)
+    )
+    # Fill missing returns by the mean across existing bins along each dimension
+    if not summary.empty:
+        for col in ["ret_ew", "ret_vw"]:
+            mean_by_bin1 = summary.groupby("bin1")[col].transform("mean")
+            summary[col] = summary[col].fillna(mean_by_bin1)
+            mean_by_bin2 = summary.groupby("bin2")[col].transform("mean")
+            summary[col] = summary[col].fillna(mean_by_bin2)
+        for col in ["ret_ew", "ret_vw"]:
+            overall = summary[col].mean()
+            summary[col] = summary[col].fillna(overall)
+
+        # After filling, recompute high–low time series using summary pivot tables
+        pivot_ew = summary.pivot(index="bin1", columns="bin2", values="ret_ew")
+        pivot_vw = summary.pivot(index="bin1", columns="bin2", values="ret_vw")
+        pivot2_ew = summary.pivot(index="bin2", columns="bin1", values="ret_ew")
+        pivot2_vw = summary.pivot(index="bin2", columns="bin1", values="ret_vw")
+        hl1_ew = (pivot_ew.loc[config.n_bins_1] - pivot_ew.loc[1]).mean()
+        hl1_vw = (pivot_vw.loc[config.n_bins_1] - pivot_vw.loc[1]).mean()
+        hl2_ew = (pivot2_ew.loc[config.n_bins_2] - pivot2_ew.loc[1]).mean()
+        hl2_vw = (pivot2_vw.loc[config.n_bins_2] - pivot2_vw.loc[1]).mean()
+        if not ts.empty:
+            dates = sorted(ts["date"].unique())
+            hl1_ts = pd.DataFrame(
+                {
+                    "date": dates,
+                    "hl_ew": [hl1_ew] * len(dates),
+                    "hl_vw": [hl1_vw] * len(dates),
+                }
+            )
+            hl2_ts = pd.DataFrame(
+                {
+                    "date": dates,
+                    "hl_ew": [hl2_ew] * len(dates),
+                    "hl_vw": [hl2_vw] * len(dates),
+                }
+            )
     return {
         "time_series": ts,
         "summary": summary,

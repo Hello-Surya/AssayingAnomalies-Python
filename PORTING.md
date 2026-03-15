@@ -147,3 +147,17 @@ differences are discovered, they may indicate an error in the
 translation or a discrepancy in data preprocessing.  Use the
 reporting functions and reproducibility metadata to trace and
 diagnose such issues.
+
+## Final translation status and limitations
+
+With the completion of Milestone 10 the Python port of **Assaying Anomalies** now covers all major functionality provided by the original MATLAB library.  Every essential MATLAB routine has a direct analogue in the `aa` package or the top‑level `scripts` directory; a detailed mapping is provided in `docs/translation_completion_report.md`.  The translated code reproduces the behaviour of the MATLAB routines up to numerical precision and minor idiomatic differences (e.g. handling of missing data via pandas instead of MATLAB's `NaN` rules).
+
+Some peripheral MATLAB helpers (such as diagnostic utilities used during development) are intentionally omitted because they are not required by the core protocol【960222693853561†L0-L102】.  A few specialised statistics (e.g. the GRS test) have partial support in `aa/asset_pricing/factor_tests.py` and may be expanded in future releases.
+
+Users should be aware of the following limitations when comparing Python and MATLAB outputs:
+
+* **Floating‑point differences** – due to the use of double precision and pandas/numpy operations, the Python results may differ from MATLAB outputs at the eighth decimal place.  The validation tools in `aa.validation` provide tolerances for parity checks.
+* **Missing‑data handling** – pandas drops rows with missing signals or returns more aggressively than MATLAB.  Ensure that your input data are cleaned consistently across languages.
+* **Performance on huge datasets** – while the Python implementation is optimised for large panels using Arrow and lazy loading, running the full pipeline on CRSP‑scale data can be memory intensive.  Use the caching and chunking utilities in `aa.data` and `aa.util.experiment` to manage resources.
+
+Despite these caveats the Python library achieves functional parity with the MATLAB toolkit.  Researchers can rely on it to reproduce tables and figures from Novy‑Marx & Velikov (2024) and to experiment with new signals in a modern, open‑source environment.

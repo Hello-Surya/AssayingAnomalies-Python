@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "assayinganomalies"
+version = "0.1.0"
+description = "Python translation of the Assaying Anomalies MATLAB library for anomaly evaluation and portfolio sorting"
+authors = [ { name = "Assaying Anomalies Development Team", email = "maintainers@example.com" } ]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.21",
+    "scipy>=1.7",
+    "statsmodels>=0.14",
+    "matplotlib>=3.5",
+    "seaborn>=0.13",
+    "scikit-learn>=1.3",
+    "pyarrow>=10.0",
+    "polars>=0.18"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Hello-Surya/AssayingAnomalies-Python"
+"Documentation" = "https://github.com/Hello-Surya/AssayingAnomalies-Python/tree/main/docs"

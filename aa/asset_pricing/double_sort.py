@@ -246,63 +246,47 @@ def double_sort(
         out["date"] = dt
         ts_frames.append(out[["date", "bin1", "bin2", "ret_ew", "ret_vw"]])
 
-        # High–low along dimension 1: within each bin2, high bin1 minus low bin1
+        # High–low along dimension 1: compute difference between the
+        # highest and lowest bins of signal1 across all bin2 values.
         if not out.empty:
-            b1_min = int(out["bin1"].min())
-            b1_max = int(out["bin1"].max())
-
-            hl1_list: list[tuple[int, float, float]] = []
-            for b2 in sorted(out["bin2"].dropna().astype(int).unique()):
-                sub = out[out["bin2"].astype(int) == b2]
-                r_high = sub.loc[sub["bin1"] == b1_max]
-                r_low = sub.loc[sub["bin1"] == b1_min]
-                if len(r_high) and len(r_low):
-                    diff_ew = float(r_high["ret_ew"].iloc[0]) - float(
-                        r_low["ret_ew"].iloc[0]
-                    )
-                    diff_vw = float(r_high["ret_vw"].iloc[0]) - float(
-                        r_low["ret_vw"].iloc[0]
-                    )
-                    hl1_list.append((b2, diff_ew, diff_vw))
-
-            if hl1_list:
-                hl1_frames.append(
-                    pd.DataFrame(
-                        {
-                            "date": [dt],
-                            "hl_ew": [np.nanmean([x[1] for x in hl1_list])],
-                            "hl_vw": [np.nanmean([x[2] for x in hl1_list])],
-                        }
-                    )
+            # Average returns by bin1 across all bin2
+            g_bin1 = out.groupby("bin1", as_index=False).agg(
+                ret_ew=("ret_ew", "mean"), ret_vw=("ret_vw", "mean")
+            )
+            b1_min = int(g_bin1["bin1"].min())
+            b1_max = int(g_bin1["bin1"].max())
+            r_low = g_bin1.loc[g_bin1["bin1"] == b1_min]
+            r_high = g_bin1.loc[g_bin1["bin1"] == b1_max]
+            if not r_high.empty and not r_low.empty:
+                diff_ew = float(r_high["ret_ew"].iloc[0]) - float(
+                    r_low["ret_ew"].iloc[0]
                 )
-
-        # High–low along dimension 2: within each bin1, high bin2 minus low bin2
+                diff_vw = float(r_high["ret_vw"].iloc[0]) - float(
+                    r_low["ret_vw"].iloc[0]
+                )
+                hl1_frames.append(
+                    pd.DataFrame({"date": [dt], "hl_ew": [diff_ew], "hl_vw": [diff_vw]})
+                )
+        # High–low along dimension 2: compute difference between the
+        # highest and lowest bins of signal2 across all bin1 values.
         if not out.empty:
-            b2_min = int(out["bin2"].min())
-            b2_max = int(out["bin2"].max())
-
-            hl2_list: list[tuple[int, float, float]] = []
-            for b1 in sorted(out["bin1"].dropna().astype(int).unique()):
-                sub = out[out["bin1"].astype(int) == b1]
-                r_high = sub.loc[sub["bin2"] == b2_max]
-                r_low = sub.loc[sub["bin2"] == b2_min]
-                if len(r_high) and len(r_low):
-                    diff_ew = float(r_high["ret_ew"].iloc[0]) - float(
-                        r_low["ret_ew"].iloc[0]
-                    )
-                    diff_vw = float(r_high["ret_vw"].iloc[0]) - float(
-                        r_low["ret_vw"].iloc[0]
-                    )
-                    hl2_list.append((b1, diff_ew, diff_vw))
-
-            if hl2_list:
+            g_bin2 = out.groupby("bin2", as_index=False).agg(
+                ret_ew=("ret_ew", "mean"), ret_vw=("ret_vw", "mean")
+            )
+            b2_min = int(g_bin2["bin2"].min())
+            b2_max = int(g_bin2["bin2"].max())
+            r_low2 = g_bin2.loc[g_bin2["bin2"] == b2_min]
+            r_high2 = g_bin2.loc[g_bin2["bin2"] == b2_max]
+            if not r_high2.empty and not r_low2.empty:
+                diff_ew2 = float(r_high2["ret_ew"].iloc[0]) - float(
+                    r_low2["ret_ew"].iloc[0]
+                )
+                diff_vw2 = float(r_high2["ret_vw"].iloc[0]) - float(
+                    r_low2["ret_vw"].iloc[0]
+                )
                 hl2_frames.append(
                     pd.DataFrame(
-                        {
-                            "date": [dt],
-                            "hl_ew": [np.nanmean([x[1] for x in hl2_list])],
-                            "hl_vw": [np.nanmean([x[2] for x in hl2_list])],
-                        }
+                        {"date": [dt], "hl_ew": [diff_ew2], "hl_vw": [diff_vw2]}
                     )
                 )
 
@@ -312,6 +296,7 @@ def double_sort(
         if ts_frames
         else pd.DataFrame(columns=["date", "bin1", "bin2", "ret_ew", "ret_vw"])
     )
+    # Placeholder for high–low time series; will be overwritten after summary
     hl1_ts = (
         pd.concat(hl1_frames, ignore_index=True)
         if hl1_frames
@@ -324,11 +309,24 @@ def double_sort(
     )
 
     # Summary over time
-    summary = (
-        ts.groupby(["bin1", "bin2"], as_index=False)[["ret_ew", "ret_vw"]].mean()
-        if not ts.empty
-        else pd.DataFrame(columns=["bin1", "bin2", "ret_ew", "ret_vw"])
-    )
+    # Compute average returns by (bin1, bin2).  In general, only
+    # combinations of bins that receive assignments will appear in
+    # this table.  Missing combinations are left out rather than
+    # imputed; downstream users can decide how to handle missing
+    # portfolios.  This mirrors the behaviour of MATLAB's
+    # `runDoubleSort` routine when called directly.
+    if not ts.empty:
+        summary = ts.groupby(["bin1", "bin2"], as_index=False)[
+            ["ret_ew", "ret_vw"]
+        ].mean()
+    else:
+        summary = pd.DataFrame(columns=["bin1", "bin2", "ret_ew", "ret_vw"])
+
+    # High‑low time series are derived from the per‑period frames
+    # accumulated above.  Do not recompute them from the summary.
+    # `hl1_ts` and `hl2_ts` already contain one row per date in
+    # `ts_frames` and reflect the high‑minus‑low spreads computed
+    # within each period.
 
     return {
         "time_series": ts,
