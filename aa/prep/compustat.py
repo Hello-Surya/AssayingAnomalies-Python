@@ -17,7 +17,6 @@ from __future__ import annotations
 from typing import Iterable, List
 import pandas as pd
 
-
 _REQUIRED = ["gvkey", "datadate", "fyear", "fyr"]
 _COMMON = ["at", "ceq", "sale", "lt", "seqq", "txditc"]  # included if present
 

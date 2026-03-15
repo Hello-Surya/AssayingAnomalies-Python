@@ -17,7 +17,7 @@ def test_integration_end_to_end():
     expected shapes.
     """
     # Generate synthetic panel for 12 months and 10 firms
-    dates = pd.date_range("2020-01-31", periods=12, freq="M")
+    dates = pd.date_range("2020-01-31", periods=12, freq="ME")
     firms = list(range(1, 11))
     rows = []
     me_rows = []

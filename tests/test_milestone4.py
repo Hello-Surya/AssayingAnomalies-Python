@@ -35,7 +35,7 @@ from aa.reporting.stability_tables import (
 class TestMilestone4(unittest.TestCase):
     def setUp(self):
         # Create small synthetic data for tests
-        dates = pd.date_range("2020-01-31", periods=6, freq="M")
+        dates = pd.date_range("2020-01-31", periods=6, freq="ME")
         self.returns = pd.DataFrame(
             {
                 "date": dates.repeat(3),

@@ -87,9 +87,7 @@ def characteristic_managed_portfolio(
 
     # Normalise dates
     for df in (returns, characteristics):
-        df.loc[:, "date"] = pd.to_datetime(df["date"], errors="coerce").dt.tz_localize(
-            None
-        )
+        df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.tz_localize(None)
 
     data = (
         returns[["date", "permno", "ret"]]

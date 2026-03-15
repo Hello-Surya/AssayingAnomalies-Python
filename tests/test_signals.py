@@ -57,7 +57,7 @@ def test_book_to_market_returns_dataframe():
 
 def test_momentum_signal_shape():
     # Create returns for 2 firms over 15 months
-    dates = pd.date_range("2020-01-31", periods=15, freq="M")
+    dates = pd.date_range("2020-01-31", periods=15, freq="ME")
     panel = pd.DataFrame(
         [(d, p, 0.01 * (i + p)) for i, d in enumerate(dates) for p in [1, 2]],
         columns=["date", "permno", "ret"],
