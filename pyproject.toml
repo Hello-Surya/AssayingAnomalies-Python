@@ -79,3 +79,7 @@ target-version = ["py39", "py310", "py311"]
 [tool.mypy]
 ignore_missing_imports = true
 show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["scipy", "scipy.*"]
+ignore_missing_imports = true
