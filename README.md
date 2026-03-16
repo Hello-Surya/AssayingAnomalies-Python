@@ -8,48 +8,25 @@
         build status, latest PyPI release and licence.
     -->
 
-# Assaying Anomalies – Python Library
+# Assaying Anomalies – Python Library
 
-<<<<<<< HEAD
 ![CI](https://github.com/Hello-Surya/AssayingAnomalies-Python/actions/workflows/tests.yml/badge.svg)
-=======
-![CI](https://github.com/Hello-Surya/AssayingAnomalies-
-Python/actions/workflows/tests.yml/badge.svg)
->>>>>>> 26b81a9 (Milestone 12: add reproducibility infrastructure, synthetic dataset generator, integration test, release tooling, and developer docs)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-The **Assaying Anomalies** project provides a rigorous, open‑source
-protocol for evaluating cross‑sectional stock return predictors.  This
-repository contains a complete Python translation of the MATLAB toolkit
-originally developed by Robert Novy‑Marx and Mihail Velikov.  The aim is
-strict functional fidelity: all major features of the MATLAB library
-have been ported to Python, including anomaly signal construction,
-portfolio sorts, Fama–MacBeth regressions, evaluation metrics,
-publication‑quality tables and figures, and an end‑to‑end replication
-pipeline.
+The **Assaying Anomalies** project provides a rigorous, open-source protocol for evaluating cross-sectional stock return predictors. This repository contains a Python translation of the MATLAB toolkit originally developed by Robert Novy-Marx and Mihail Velikov. The goal is strict functional fidelity: the library supports anomaly signal construction, portfolio sorts, Fama–MacBeth regressions, evaluation metrics, tables, figures, and an end-to-end replication workflow.
 
 ## Installation
 
-The package requires Python ≥ 3.9 and relies on standard scientific
-libraries such as `pandas`, `numpy`, `statsmodels` and `matplotlib`.
+The package requires Python 3.9+ and uses standard scientific Python libraries such as `pandas`, `numpy`, `statsmodels`, and `matplotlib`.
 
-To install the latest stable release from
-[PyPI](https://pypi.org/project/assaying-anomalies/), run:
-
-```bash
-pip install assaying-anomalies
-```
-
-If you wish to modify the code locally or work on the development version,
-clone the repository and install it in editable mode along with
-development dependencies:
+To install the development version locally:
 
 ```bash
 git clone https://github.com/Hello-Surya/AssayingAnomalies-Python.git
 cd AssayingAnomalies-Python
 pip install -e .[dev]
-```
+
 
 This will install the package itself plus testing and linting tools
 such as `pytest`, `ruff` and `mypy`.
