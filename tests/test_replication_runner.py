@@ -44,7 +44,7 @@ def test_run_experiment_determinism(tmp_path: Path) -> None:
             "n_periods": 6,
             "n_stocks": 20,
             "start_date": "2000-01-31",
-            "freq": "M",
+            "freq": "ME",
             "seed": 123,
         },
         "signals": [

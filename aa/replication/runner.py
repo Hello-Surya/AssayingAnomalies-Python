@@ -71,6 +71,8 @@ def run_experiment(config_path: str | Path) -> Dict[str, Any]:
     data_cfg: Dict[str, Any] = config.get("data", {})
     if data_cfg.get("source", "").lower() == "synthetic":
         gen_kwargs = {k: v for k, v in data_cfg.items() if k not in {"source"}}
+        if gen_kwargs.get("freq") == "M":
+            gen_kwargs["freq"] = "ME"
         panel = generate_synthetic_panel(**gen_kwargs)
     else:
         dataset_path = data_cfg.get("path")
