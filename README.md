@@ -8,10 +8,9 @@
         build status, latest PyPI release and licence.
     -->
 
-# Assaying Anomalies – Python Library
+# Assaying Anomalies – Python Library
 
-![CI](https://github.com/Hello-Surya/AssayingAnomalies-
-Python/actions/workflows/tests.yml/badge.svg)
+![CI](https://github.com/Hello-Surya/AssayingAnomalies-Python/actions/workflows/tests.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
