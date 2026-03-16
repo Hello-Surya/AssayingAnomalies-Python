@@ -1,12 +1,11 @@
 <!--
-        README for the Assaying Anomalies Python library.
+README for the Assaying Anomalies Python library.
 
-        This document is intended to be both the landing page on GitHub and
-        the long description displayed on PyPI.  It provides an overview
-        of the project, installation instructions, feature highlights and
-        links to further documentation.  The badges at the top reflect
-        build status, latest PyPI release and licence.
-    -->
+This document serves as both the GitHub landing page and the long
+description for the PyPI package. It provides an overview of the
+project, installation instructions, feature highlights, and links
+to additional documentation.
+-->
 
 # Assaying Anomalies – Python Library
 
@@ -14,11 +13,20 @@
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-The **Assaying Anomalies** project provides a rigorous, open-source protocol for evaluating cross-sectional stock return predictors. This repository contains a Python translation of the MATLAB toolkit originally developed by Robert Novy-Marx and Mihail Velikov. The goal is strict functional fidelity: the library supports anomaly signal construction, portfolio sorts, Fama–MacBeth regressions, evaluation metrics, tables, figures, and an end-to-end replication workflow.
+The **Assaying Anomalies** project provides a rigorous, open-source protocol for evaluating cross-sectional stock return predictors.
 
-## Installation
+This repository contains a Python translation of the MATLAB toolkit originally developed by **Robert Novy-Marx** and **Mihail Velikov**. The goal is strict functional fidelity: the library supports anomaly signal construction, portfolio sorts, Fama–MacBeth regressions, evaluation metrics, tables, figures, and an end-to-end replication workflow.
 
-The package requires Python 3.9+ and uses standard scientific Python libraries such as `pandas`, `numpy`, `statsmodels`, and `matplotlib`.
+---
+
+# Installation
+
+The package requires **Python 3.9+** and relies on standard scientific libraries such as:
+
+- pandas
+- numpy
+- statsmodels
+- matplotlib
 
 To install the development version locally:
 
@@ -26,143 +34,3 @@ To install the development version locally:
 git clone https://github.com/Hello-Surya/AssayingAnomalies-Python.git
 cd AssayingAnomalies-Python
 pip install -e .[dev]
-
-
-This will install the package itself plus testing and linting tools
-such as `pytest`, `ruff` and `mypy`.
-
-## Feature highlights
-
-* **Pure functions for anomaly signals** – Compute standard predictors
-  (size, book‑to‑market, momentum, investment and profitability) using
-  concise, well‑tested functions.  Signals operate on `pandas`
-  DataFrames and return a uniform interface suitable for merging and
-  analysis.
-
-* **Univariate and double sorts** – Form equal‑ and value‑weighted
-  portfolios on one or two characteristics using flexible sorting
-  configurations.  Compute high‑minus‑low spreads and examine time‑series
-  of portfolio returns.
-
-* **Two‑pass regressions** – Run Fama–MacBeth regressions with
-  automatic Newey–West standard errors to estimate risk prices for
-  one or multiple signals simultaneously.
-
-* **Multi‑signal evaluation pipeline** – Evaluate arbitrary sets of
-  signals in a single call, producing dictionaries of performance
-  metrics (mean return, t‑statistic, Sharpe ratio, drawdown, turnover,
-  etc.).
-
-* **Tables and figures** – Generate publication‑quality tables and
-  figures that mirror those in the original MATLAB documentation.
-
-* **Command‑line scripts** – Orchestrate the full anomaly pipeline
-  without writing any custom code via scripts in the `scripts/`
-  directory.
-
-* **Extensible and reproducible** – The codebase is modular and
-  documented, with deterministic behaviours and validation utilities to
-  ensure parity with the MATLAB results.  Researchers can easily add
-  new signals while preserving the core protocol.
-
-## Quick start
-
-If you prefer to learn by example, open the Jupyter notebook
-`notebooks/assaying_anomalies_quickstart.ipynb` after installing the
-package.  The notebook demonstrates how to:
-
-1. Generate synthetic CRSP‑ and Compustat‑style data.
-2. Compute standard anomaly signals.
-3. Perform a univariate portfolio sort and compute high‑minus‑low spreads.
-4. Estimate a Fama–MacBeth regression with Newey–West adjustments.
-5. Visualise and interpret the resulting tables and plots.
-
-You can also run the self‑contained example scripts in the `examples/`
-folder.  For instance:
-
-```bash
-python examples/usage_walkthrough.py
-```
-
-will execute a narrated walkthrough of the basic workflow on synthetic
-data.
-
-## Documentation
-
-Additional documentation lives in the `docs/` directory.  Notable
-resources include:
-
-* **`docs/architecture.md`** – High‑level overview of the system design
-  and key modules.
-* **`docs/usage_guide.md`** – A comprehensive usage guide with code
-  samples and explanations.
-* **`docs/translation_completion_report.md`** – Details the mapping
-  between MATLAB functions and their Python counterparts, alongside
-  translation coverage statistics.
-* **`PORTING.md`** – Notes on the porting process and final status of
-  translation.
-
-## Contributing
-
-Contributions are welcome!  Please read
-[`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines on how to report
-bugs, propose improvements, run tests and adhere to the project’s
-coding standards.  In brief, we use `black` for formatting, `ruff` for
-linting and `mypy` for type checking.  Unit tests live in the
-`tests/` directory and can be run with `pytest`.
-
-## Reproducible environments
-
-To ensure that results can be reproduced and that collaborators are
-working in identical setups, we provide two environment specification
-files: `environment.yml` and `requirements-dev.txt`.  These files pin
-the versions of Python and all runtime and development dependencies.
-
-To create the environment using conda, run:
-
-```bash
-conda env create -f environment.yml
-conda activate assaying-anomalies-env
-```
-
-Alternatively, you can install the development dependencies with pip:
-
-```bash
-pip install -r requirements-dev.txt
-```
-
-These files mirror the dependencies defined in the project's
-`pyproject.toml`【753162988832289†L16-L26】 and include additional tooling such as
-`pytest`, `black` and `mypy` for development【753162988832289†L49-L59】.
-
-## Synthetic data testing
-
-Users who do not have access to WRDS can still experiment with the
-library using synthetic data.  The module `aa/data/synthetic_generator.py`
-implements a `generate_synthetic_panel` function that simulates
-panel data of stock returns, market equity and a predictive signal.
-The integration test in `tests/test_full_pipeline.py` uses this
-generator to run a complete anomaly pipeline – univariate sorts,
-portfolio return calculation and Fama–MacBeth regressions – without
-any external data.  This makes it easy to verify the installation and
-understand the API before working with real CRSP/Compustat inputs.
-
-## Repository maintenance and release tools
-
-Several scripts under `scripts/` help maintain the health of the
-repository and produce reproducible releases:
-
-* **`scripts/run_repo_diagnostics.py`** – Runs the test suite, checks
-  that documentation and environment files exist and attempts to import
-  the package.  Use this script to validate the repository before
-  submitting a pull request.
-* **`scripts/create_versioned_release.py`** – Bumps the version number
-  in `pyproject.toml`, builds source and wheel distributions with
-  `python -m build`, archives the release and generates a release notes
-  template.  This script streamlines the process of preparing a new
-  PyPI release.
-
-## Licence
-
-This project is released under the terms of the MIT licence.  See
-[`LICENSE`](LICENSE) for the full text.
