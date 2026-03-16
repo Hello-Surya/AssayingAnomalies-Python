@@ -20,3 +20,5 @@ twine>=5.0
 
 # Additional type stubs
 scipy-stubs
+PyYAML
+types-PyYAML
