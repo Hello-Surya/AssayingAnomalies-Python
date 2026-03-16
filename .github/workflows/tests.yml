@@ -26,7 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .
           pip install black ruff mypy pytest pytest-cov build twine PyYAML types-PyYAML
-          if [ "${{ matrix.python-version }}" != "3.9" ]; then
+          if [ "${{ matrix.python-version }}" = "3.11" ]; then
             pip install scipy-stubs
           fi
 
