@@ -62,7 +62,9 @@ def _format_table(df: pd.DataFrame) -> Dict[str, str]:
     fmt_df = df.copy()
     for col in fmt_df.columns:
         if pd.api.types.is_float_dtype(fmt_df[col]):
-            fmt_df[col] = fmt_df[col].map(lambda x: f"{x:.3f}" if pd.notna(x) else "")
+            numeric_col = fmt_df[col].astype(float)
+            fmt_df[col] = numeric_col.map(lambda x: f"{x:.3f}" if pd.notna(x) else "")
+
     # Construct Markdown using pandas' to_markdown if available
     try:
         md = fmt_df.to_markdown(index=True)

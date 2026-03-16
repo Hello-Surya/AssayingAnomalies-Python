@@ -18,7 +18,8 @@ def _format_table(df: pd.DataFrame) -> dict[str, str]:
     # format floats nicely
     for col in fmt_df.columns:
         if pd.api.types.is_float_dtype(fmt_df[col]):
-            fmt_df[col] = fmt_df[col].map(lambda x: f"{x:.3f}" if pd.notna(x) else "")
+            numeric_col = fmt_df[col].astype(float)
+            fmt_df[col] = numeric_col.map(lambda x: f"{x:.3f}" if pd.notna(x) else "")
 
     try:
         markdown = fmt_df.to_markdown(index=False)

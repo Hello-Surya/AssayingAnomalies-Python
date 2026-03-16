@@ -150,8 +150,8 @@ pip install -r requirements-dev.txt
 ```
 
 These files mirror the dependencies defined in the project's
-`pyproject.toml`【753162988832289†L16-L26】 and include additional tooling such as
-`pytest`, `black` and `mypy` for development【753162988832289†L49-L59】.
+`pyproject.toml` and include additional tooling such as
+`pytest`, `black` and `mypy` for development.
 
 ## Synthetic data testing
 
@@ -179,6 +179,43 @@ repository and produce reproducible releases:
   `python -m build`, archives the release and generates a release notes
   template.  This script streamlines the process of preparing a new
   PyPI release.
+
+## Replication package and reproducibility
+
+This repository includes a dedicated replication package designed to
+facilitate long‑term archival and reproducibility of research results.
+All replication resources live in the top‑level `replication/` directory.
+Within this directory you will find configuration files defining
+experiments (`replication/configs/`), as well as output subdirectories
+for tables, figures and logs.  The command‑line scripts used to run
+experiments and generate summary reports live in the top‑level
+`scripts/` directory; `replication/scripts/` exists only as a
+placeholder for compatibility with journal replication package
+conventions.  See
+`docs/replication_guide.md` for a detailed overview of the structure
+and how to use it.
+
+To run a replication experiment, invoke the runner script with a YAML
+configuration file.  For example:
+
+```bash
+python scripts/run_replication_experiment.py --config replication/configs/size_anomaly.yaml
+```
+
+The runner will seed all random number generators, load or generate the
+dataset, compute the specified anomaly signal, form portfolios, run a
+Fama–MacBeth regression and save tables and figures to the appropriate
+subdirectories.  It also writes a machine‑readable manifest and
+reproducibility metadata to help verify and archive the results.  A
+summary report aggregating multiple experiments can be generated via
+
+```bash
+python scripts/generate_replication_summary.py --outputs_dir replication/outputs --output replication/replication_summary.md
+```
+
+These features make it straightforward to share and reproduce
+experiments, ensuring that published findings remain transparent and
+verifiable.
 
 ## Licence
 

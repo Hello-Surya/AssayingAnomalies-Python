@@ -1,0 +1,48 @@
+# Example configuration file for replicating a size anomaly experiment.
+#
+# This file defines all parameters required to run a replication
+# experiment using the provided scripts.  It illustrates how to
+# configure the data source, the anomaly signal, portfolio sorting
+# settings, regression options and output locations.  The use of
+# synthetic data ensures that the experiment can be executed without
+# access to proprietary datasets.
+
+experiment_name: size_anomaly
+
+data:
+  # Use synthetic data to ensure accessibility without proprietary datasets.
+  source: synthetic
+  n_periods: 120
+  n_stocks: 300
+  start_date: "2000-01-31"
+  freq: "M"
+  seed: 42
+
+# Signals define which characteristic to use for sorting.
+signals:
+  - name: size
+    column: me
+    transform: log  # Use the log of market equity as the signal.
+
+# Portfolio sorting parameters.
+portfolio:
+  n_bins: 5
+  nyse_breaks: false
+  min_obs: 20
+
+# Regression settings for the Fama–MacBeth estimator.
+regression:
+  y: ret
+  xcols: [signal]
+  time_col: yyyymm
+  nw_lags: null
+
+# Output locations.  Relative paths are resolved from the repository root.
+output:
+  directory: replication/outputs/size_anomaly
+  tables_dir: replication/tables
+  figures_dir: replication/figures
+  logs_dir: replication/logs
+
+# Seed for overall experiment reproducibility.  Overrides data.seed if provided.
+seed: 42
