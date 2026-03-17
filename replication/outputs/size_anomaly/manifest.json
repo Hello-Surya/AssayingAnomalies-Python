@@ -1,0 +1,54 @@
+{
+  "experiment_name": "size_anomaly",
+  "timestamp": "2026-03-17T00:54:05.023387Z",
+  "package_version": "1.0.0",
+  "config": {
+    "experiment_name": "size_anomaly",
+    "data": {
+      "source": "synthetic",
+      "n_periods": 120,
+      "n_stocks": 300,
+      "start_date": "2000-01-31",
+      "freq": "ME",
+      "seed": 42
+    },
+    "signals": [
+      {
+        "name": "size",
+        "column": "me",
+        "transform": "log"
+      }
+    ],
+    "portfolio": {
+      "n_bins": 5,
+      "nyse_breaks": false,
+      "min_obs": 20
+    },
+    "regression": {
+      "y": "ret",
+      "xcols": [
+        "signal"
+      ],
+      "time_col": "yyyymm",
+      "nw_lags": null
+    },
+    "output": {
+      "directory": "replication/outputs/size_anomaly",
+      "tables_dir": "replication/tables",
+      "figures_dir": "replication/figures",
+      "logs_dir": "replication/logs"
+    },
+    "seed": 42
+  },
+  "outputs": {
+    "time_series": "replication\\outputs\\size_anomaly\\time_series.csv",
+    "summary": "replication\\outputs\\size_anomaly\\summary.csv",
+    "lambdas": "replication\\outputs\\size_anomaly\\lambdas.csv",
+    "lambda_ts": "replication\\outputs\\size_anomaly\\lambda_ts.csv",
+    "se": "replication\\outputs\\size_anomaly\\se.csv",
+    "tstat": "replication\\outputs\\size_anomaly\\tstat.csv",
+    "n_obs": "replication\\outputs\\size_anomaly\\n_obs.csv",
+    "figure": "replication\\figures\\size_anomaly_returns.png",
+    "reproducibility": "replication\\logs\\size_anomaly_reproducibility.json"
+  }
+}

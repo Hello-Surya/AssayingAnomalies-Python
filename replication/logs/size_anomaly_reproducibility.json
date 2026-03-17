@@ -1,0 +1,10 @@
+{
+  "config_hash": "db7ebbcd4d45f5bf5f09c0662b17d593d9c318f4bcdc616ad048493bbd4cb76e",
+  "experiment_id": "db7ebbcd",
+  "experiment_name": "size_anomaly",
+  "numpy_version": "2.4.3",
+  "pandas_version": "3.0.1",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.14.3",
+  "timestamp": "2026-03-17T00:54:04.992983Z"
+}

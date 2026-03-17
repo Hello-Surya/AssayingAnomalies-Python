@@ -1,0 +1,15 @@
+{
+  "tables": [],
+  "figures": [],
+  "logs": [],
+  "configs": [
+    "configs\\size_anomaly.yaml"
+  ],
+  "reports": [
+    "reports\\verification_report.json"
+  ],
+  "metadata": [
+    "metadata.json"
+  ],
+  "generated_at": "2026-03-17T00:54:05.215343+00:00"
+}

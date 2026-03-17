@@ -12,6 +12,7 @@ assaying_anomalies.egg-info/SOURCES.txt
 assaying_anomalies.egg-info/dependency_links.txt
 assaying_anomalies.egg-info/requires.txt
 assaying_anomalies.egg-info/top_level.txt
+tests/test_artifact_generation.py
 tests/test_characteristic.py
 tests/test_dates.py
 tests/test_double_sort.py

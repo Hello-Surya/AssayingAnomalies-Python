@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-03-17T00:53:59.933127+00:00",
+  "environment": {
+    "status": "success",
+    "aa_version": "unknown"
+  },
+  "synthetic_generator": {
+    "status": "success",
+    "rows": 36000,
+    "columns": [
+      "date",
+      "permno",
+      "me",
+      "exchcd",
+      "signal",
+      "ret"
+    ]
+  },
+  "example_pipeline": {
+    "status": "failure",
+    "returncode": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"pandas/_libs/tslibs/offsets.pyx\", line 6313, in pandas._libs.tslibs.offsets.to_offset\n  File \"pandas/_libs/tslibs/offsets.pyx\", line 6180, in pandas._libs.tslibs.offsets._validate_to_offset_alias\nValueError: 'M' is no longer supported for offsets. Please use 'ME' instead.\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\VS Code\\Assaying_Anomalies-Python\\Assaying_Anomalies-Python\\AssayingAnomalies-Python\\examples\\usage_walkthrough.py\", line 140, in <module>\n    main()\n    ~~~~^^\n  File \"C:\\VS Code\\Assaying_Anomalies-Python\\Assaying_Anomalies-Python\\AssayingAnomalies-Python\\examples\\usage_walkthrough.py\", line 68, in main\n    panel = generate_synthetic_panel()\n  File \"C:\\VS Code\\Assaying_Anomalies-Python\\Assaying_Anomalies-Python\\AssayingAnomalies-Python\\examples\\usage_walkthrough.py\", line 49, in generate_synthetic_panel\n    dates = pd.date_range(\"2010-01-31\", periods=n_months, freq=\"M\")\n  File \"C:\\VS Code\\Assaying_Anomalies-Python\\Assaying_Anomalies-Python\\AssayingAnomalies-Python\\.venv\\Lib\\site-packages\\pandas\\core\\indexes\\datetimes.py\", line 1442, in date_range\n    freq = to_offset(freq)\n  File \"pandas/_libs/tslibs/offsets.pyx\", line 6229, in pandas._libs.tslibs.offsets.to_offset\n  File \"pandas/_libs/tslibs/offsets.pyx\", line 6352, in pandas._libs.tslibs.offsets.to_offset\n  File \"pandas/_libs/tslibs/offsets.pyx\", line 6137, in pandas._libs.tslibs.offsets.raise_invalid_freq\nValueError: Invalid frequency: M. Failed to parse with error message: ValueError(\"'M' is no longer supported for offsets. Please use 'ME' instead.\")\n"
+  },
+  "replication_experiment": {
+    "status": "failure",
+    "returncode": 2,
+    "stderr": "usage: run_replication_experiment.py [-h] --config CONFIG\nrun_replication_experiment.py: error: unrecognized arguments: --outputs_dir C:\\Users\\hello\\AppData\\Local\\Temp\\tmp3tz0m2x6\\verify_tmp\\replication_outputs\n"
+  },
+  "tests": {
+    "status": "skipped",
+    "reason": "skip-tests flag used"
+  }
+}

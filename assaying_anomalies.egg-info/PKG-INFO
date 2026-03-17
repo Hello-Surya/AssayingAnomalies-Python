@@ -268,3 +268,49 @@ verifiable.
 
 This project is released under the terms of the MIT licence.  See
 [`LICENSE`](LICENSE) for the full text.
+
+## Project verification and artifact generation
+
+To provide long‑term reproducibility guarantees, the repository now
+includes a comprehensive verification and artifact generation
+framework.  The `scripts/verify_full_project.py` script performs an
+end‑to‑end health check: it imports the package, generates synthetic
+data, runs an example pipeline, executes a replication experiment and
+invokes the test suite.  A JSON report summarising the outcome of
+each check is written to disk.  Invoke the verifier with:
+
+```bash
+python scripts/verify_full_project.py
+```
+
+The `scripts/build_research_artifact.py` script wraps the verifier and
+replication runner to produce a complete research artifact.  It
+collects the outputs (tables, figures and logs), the configuration
+files used, the verification report and reproducibility metadata into
+a single directory, along with a machine‑readable manifest.  Build an
+artifact with:
+
+```bash
+python scripts/build_research_artifact.py --artifact-dir artifact
+```
+
+The resulting `artifact/` directory can be archived or shared to allow
+others to reproduce the experiments without ambiguity.
+
+## Preparing a final release
+
+The `scripts/prepare_final_release.py` script automates the final
+release process.  It runs the full verification, builds source and
+wheel distributions, packages a snapshot of the repository and
+generates release notes by collating the archival documentation and
+project completion report.  Use it as follows:
+
+```bash
+python scripts/prepare_final_release.py --output-dir release
+```
+
+This will create a `release/` directory containing the distributions,
+repository snapshot, pre‑release verification report and release
+notes.  Together with the research artifact, these files ensure that
+the Assaying Anomalies Python library is ready for long‑term
+archival and future reproducibility studies.
