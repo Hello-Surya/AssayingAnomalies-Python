@@ -25,7 +25,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .
-          pip install black ruff mypy pytest pytest-cov build twine PyYAML types-PyYAML
+          pip install black==24.10.0 ruff mypy pytest pytest-cov build twine PyYAML types-PyYAML
           if [ "${{ matrix.python-version }}" = "3.11" ]; then
             pip install scipy-stubs
           fi
@@ -33,12 +33,12 @@ jobs:
       - name: Lint
         run: |
           python -m ruff check .
-          python -m black --check .
+          python -m black --required-version 24.10.0 --check .
 
       - name: Type check
         if: matrix.python-version == '3.11'
         run: |
-          python -m mypy aa examples
+          python -m mypy aa scripts
 
       - name: Run tests
         run: |
