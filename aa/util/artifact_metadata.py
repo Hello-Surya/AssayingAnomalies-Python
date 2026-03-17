@@ -57,7 +57,7 @@ def gather_metadata(
         except Exception:
             metadata["verification_report"] = None
 
-    metadata["timestamp"] = datetime.datetime.now(datetime.UTC).isoformat()
+    metadata["timestamp"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     return metadata
 
 

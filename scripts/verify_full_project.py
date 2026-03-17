@@ -197,7 +197,7 @@ def main() -> None:
         tmp_dir = pathlib.Path(tmp_dir_obj.name)
 
     report: dict[str, Any] = {
-        "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
 
     verify_environment(report)

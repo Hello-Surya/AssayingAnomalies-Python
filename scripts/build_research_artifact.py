@@ -154,7 +154,7 @@ def build_artifact(artifact_dir: pathlib.Path) -> None:
         "configs": [str((configs_dest / config_path.name).relative_to(artifact_dir))],
         "reports": [str(report_copy.relative_to(artifact_dir))],
         "metadata": [str(metadata_path.relative_to(artifact_dir))],
-        "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
+        "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
 
     manifest_path = artifact_dir / "manifest.json"
