@@ -65,11 +65,10 @@ Documentation = "https://github.com/Hello-Surya/AssayingAnomalies-Python/tree/ma
 Source = "https://github.com/Hello-Surya/AssayingAnomalies-Python"
 BugTracker = "https://github.com/Hello-Surya/AssayingAnomalies-Python/issues"
 
-[tool.setuptools]
-packages = ["aa"]
-
-[tool.setuptools.package-dir]
-aa = "aa"
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aa*"]
+exclude = ["tests*", "docs*", "examples*"]
 
 [tool.ruff]
 line-length = 88
